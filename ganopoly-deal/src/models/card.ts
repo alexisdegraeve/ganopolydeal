@@ -35,7 +35,7 @@ export class Card {
   constructor(
     public cardType: DealType = DealType.property,
     public cardAction: DealAction | null = null,
-    public color: DealColor = DealColor.blue,
+    public color: DealColor = DealColor.lightBlue,
     public value: number = 0,
     public rent: number = 0,
     public total: number = 0

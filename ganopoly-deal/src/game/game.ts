@@ -10,6 +10,10 @@ import { Card, DealType, DealColor, DealAction } from '../models/card';
 export class GameComponent {
   cards: Card[] = [];
 
+  shuffle = (array:any) => {
+    return array.sort(() => Math.random() - 0.5);
+}
+
   private generateDeck(): Card[] {
     const deck = [];
     deck.push(new Card(DealType.property, null, DealColor.brown, 1, 1, 2));
@@ -20,14 +24,14 @@ export class GameComponent {
   }
 
   initializeCards() {
-    this.cards = this.generateDeck();
+    this.cards = this.shuffle(this.generateDeck());
+    console.log(this.cards);
   }
 
 
   newGame() {
+        console.log('New Game');
     this.initializeCards();
-    console.log('New Game');
-    console.log(this.cards);
   }
 
   constructor() {
