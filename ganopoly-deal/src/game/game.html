@@ -1,5 +1,5 @@
 <button class="btn btn-primary" (click)="newGame()">New Game</button>
 
-<div *ngFor="let card of cards$ | async">
-    <ganopoly-card [card]="card"></ganopoly-card>
+<div class="cards">
+    <ganopoly-card [card]="card" *ngFor="let card of cards$ | async"></ganopoly-card>
 </div>

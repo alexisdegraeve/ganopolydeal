@@ -10,4 +10,9 @@ import { CommonModule } from '@angular/common';
 })
 export class GanopolyCardComponent {
   @Input() card?: Card;
+  showFront = true;
+
+  toggleCard() {
+    this.showFront = !this.showFront;
+  }
 }

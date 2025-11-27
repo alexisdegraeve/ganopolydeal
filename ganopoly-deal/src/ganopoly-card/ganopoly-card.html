@@ -1,1 +1,20 @@
-{{card | json}}
+<div class="card-container" (click)="toggleCard()">
+    <div class="card-flip" [class.flipped]="!showFront">
+        <div class="front face">
+            <div class="card-body">
+                <h5 class="card-title">GANOPOLY</h5>
+                <p class="card-text">...</p>
+            </div>
+        </div>
+
+        <div class="back face">
+            <img src="..." class="card-img-top" alt="...">
+            <div class="card-body">
+                <h5 class="card-title">{{ card?.name }}</h5>
+                <p class="card-text">...</p>
+                <a href="#" class="btn btn-primary">{{ card?.valueCount }}</a>
+            </div>
+        </div>
+
+    </div>
+</div>
