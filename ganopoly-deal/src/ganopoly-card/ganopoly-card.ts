@@ -4,15 +4,20 @@ import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'ganopoly-card',
-  imports: [CommonModule],
+  imports: [CommonModule, ],
   templateUrl: './ganopoly-card.html',
   styleUrl: './ganopoly-card.scss',
 })
 export class GanopolyCardComponent {
   @Input() card?: Card;
   showFront = true;
+  selected = false;
 
   toggleCard() {
     this.showFront = !this.showFront;
+  }
+
+  toggleSelected() {
+    this.selected = !this.selected;
   }
 }

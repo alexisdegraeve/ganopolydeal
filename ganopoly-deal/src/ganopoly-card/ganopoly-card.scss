@@ -4,6 +4,13 @@
     width: 18rem;
     height: 20rem;
     cursor: pointer;
+    &.selected {
+        box-shadow: 0 0 20px 5px rgba(255, 215, 0, 0.8);
+        /* halo doré */
+        transform: scale(1.05);
+        /* léger zoom pour feedback */
+        transition: all 0.2s ease-in-out;
+    }
 }
 
 .card-flip {

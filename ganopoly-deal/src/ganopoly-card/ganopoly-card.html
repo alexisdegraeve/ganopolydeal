@@ -1,4 +1,4 @@
-<div class="card-container" (click)="toggleCard()">
+<div class="card-container" [class.selected]="selected" (click)="toggleCard()">
     <div class="card-flip" [class.flipped]="!showFront">
         <div class="front face">
             <div class="card-body">
@@ -18,3 +18,4 @@
 
     </div>
 </div>
+<button (click)="toggleSelected()">Select</button>
