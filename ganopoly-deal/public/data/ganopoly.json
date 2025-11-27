@@ -123,10 +123,6 @@
     { "id": 104, "type": "billet", "value": 5 },
     { "id": 105, "type": "billet", "value": 5 },
 
-    { "id": 106, "type": "billet", "value": 10 },
+    { "id": 106, "type": "billet", "value": 10 }
 
-    { "id": 107, "type": "regle", "name": "Règle 1" },
-    { "id": 108, "type": "regle", "name": "Règle 2" },
-    { "id": 109, "type": "regle", "name": "Règle 3" },
-    { "id": 110, "type": "regle", "name": "Règle 4" }
 ]
