@@ -2,10 +2,11 @@ import { Component } from '@angular/core';
 import { DeckService } from '../app/services/deck';
 import { Observable } from 'rxjs';
 import { CommonModule } from '@angular/common';
+import { GanopolyCardComponent } from '../ganopoly-card/ganopoly-card';
 
 @Component({
   selector: 'app-game',
-  imports: [CommonModule],
+  imports: [CommonModule, GanopolyCardComponent],
   templateUrl: './game.html',
   styleUrl: './game.scss',
 })
