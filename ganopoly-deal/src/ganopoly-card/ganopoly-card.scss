@@ -1,8 +1,8 @@
 .card-container {
     perspective: 1000px;
     /* profondeur 3D */
-    width: 18rem;
-    height: 20rem;
+    width: 13.188rem;
+    height: 20.5rem;
     cursor: pointer;
     &.selected {
         box-shadow: 0 0 20px 5px rgba(255, 215, 0, 0.8);
@@ -36,4 +36,38 @@
 
 .back {
     transform: rotateY(180deg);
+}
+
+.back {
+    aspect-ratio: 7/10;
+    perspective: 1000px;
+    background-image: url('/img/card-back.svg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    /* ou contain selon le rendu */
+}
+
+.card-body {
+    height: 100%;
+    width: 100%;
+    position: relative;
+}
+
+.prop-blue {
+    background-image: url('/img/card-prop-blue.svg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    height: 100%;
+    width: 100%;
+}
+
+.prop-title {
+    position: absolute;
+    top: 2rem;
+    text-align: center;
+    font-weight: bold;
+    width: 10rem;
+    margin-left: 1.75rem;
 }

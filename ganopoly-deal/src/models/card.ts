@@ -45,7 +45,7 @@
 
 export interface Card {
   id: number;
-  type: 'propriete' | 'propriete_joker' | 'action' | 'loyer' | 'billet' | 'regle';
+  type: CardType;
   name?: string;
   value?: number;
   set?: string;
@@ -53,4 +53,12 @@ export interface Card {
   sets?: string[];
   valueCount?: number;
   rent?: number;
+}
+export enum CardType {
+  propriete = 'propriete',
+  propriete_joker = 'propriete_joker',
+  action = 'action',
+  loyer = 'loyer',
+  billet = 'billet',
+  regle = 'regle'
 }
