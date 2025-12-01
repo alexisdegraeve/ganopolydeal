@@ -4,8 +4,14 @@
             <div class="card-body">
                 @if(card?.type === CardType.PropertyJoker) {
                 <div [ngClass]="{
-                  'prop-joker-red-yellow': card?.setType === PropertySet.Red &&  card?.setType2 === PropertySet.Yellow,
+                  'prop-joker-blue-brown': card?.setType === PropertySet.LightBlue &&  card?.setType2 === PropertySet.Brown,
+                  'prop-joker-pink-orange': card?.setType === PropertySet.Pink &&  card?.setType2 === PropertySet.Orange,
+                  'prop-joker-blue-green': card?.setType === PropertySet.DarkBlue &&  card?.setType2 === PropertySet.Green,
+                  'prop-joker-green-black': card?.setType === PropertySet.Green &&  card?.setType2 === PropertySet.Railroad,
+                  'prop-joker-black-utility': card?.setType === PropertySet.Railroad &&  card?.setType2 === PropertySet.Utility,
                   'prop-joker-blue-black': card?.setType === PropertySet.LightBlue &&  card?.setType2 === PropertySet.Railroad,
+                  'prop-joker-red-yellow': card?.setType === PropertySet.Red &&  card?.setType2 === PropertySet.Yellow,
+
                   'prop-joker': card?.setType === PropertySet.Multi
                 }">
                 </div>

@@ -30,13 +30,13 @@
 
     { "id": 29, "type": "property_joker", "setType": "LightBlue", "setType2": "Brown" },
     { "id": 30, "type": "property_joker", "setType": "LightBlue", "setType2": "Railroad" },
-    { "id": 31, "type": "property_joker", "setType": "pink", "setType2": "orange" },
-    { "id": 32, "type": "property_joker", "setType": "pink", "setType2": "orange" },
+    { "id": 31, "type": "property_joker", "setType": "Pink", "setType2": "Orange" },
+    { "id": 32, "type": "property_joker", "setType": "Pink", "setType2": "Orange" },
     { "id": 33, "type": "property_joker", "setType": "Red", "setType2": "Yellow" },
     { "id": 34, "type": "property_joker", "setType": "Red", "setType2": "Yellow" },
-    { "id": 35, "type": "property_joker", "setType": "dark_blue", "setType2": "green" },
-    { "id": 36, "type": "property_joker", "setType": "green", "setType2": "railroad" },
-    { "id": 37, "type": "property_joker", "setType": "railroad", "setType2": "utility" },
+    { "id": 35, "type": "property_joker", "setType": "DarkBlue", "setType2": "Green" },
+    { "id": 36, "type": "property_joker", "setType": "Green", "setType2": "Railroad" },
+    { "id": 37, "type": "property_joker", "setType": "Railroad", "setType2": "Utility" },
     { "id": 38, "type": "property_joker", "setType": "Multi" },
     { "id": 39, "type": "property_joker", "setType": "Multi" },
 

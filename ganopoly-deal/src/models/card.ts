@@ -61,6 +61,7 @@ export enum PropertySet {
   Green = 'Green',
   DarkBlue = 'DarkBlue',
   Railroad = 'Railroad',
+  Utility = 'Utility',
   UtilityElec = 'UtilityElec',
   UtilityWater = 'UtilityWater',
   Multi = 'Multi'
