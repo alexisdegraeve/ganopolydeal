@@ -63,11 +63,142 @@
     width: 100%;
 }
 
+.prop-pink {
+    background-image: url('/img/card-prop-pink.svg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    height: 100%;
+    width: 100%;
+}
+
+.prop-brown {
+    background-image: url('/img/card-prop-brown.svg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    height: 100%;
+    width: 100%;
+}
+
+.prop-orange {
+    background-image: url('/img/card-prop-orange.svg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    height: 100%;
+    width: 100%;
+}
+
+.prop-red {
+    background-image: url('/img/card-prop-red.svg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    height: 100%;
+    width: 100%;
+}
+
+.prop-green {
+    background-image: url('/img/card-prop-green.svg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    height: 100%;
+    width: 100%;
+}
+
+.prop-yellow {
+    background-image: url('/img/card-prop-yellow.svg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    height: 100%;
+    width: 100%;
+}
+
+.prop-light-blue {
+    background-image: url('/img/card-prop-light-blue.svg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    height: 100%;
+    width: 100%;
+}
+
+.prop-dark-blue {
+    background-image: url('/img/card-prop-dark-blue.svg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    height: 100%;
+    width: 100%;
+}
+
+.prop-railroad {
+    background-image: url('/img/card-prop-railroad.svg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    height: 100%;
+    width: 100%;
+}
+
+.prop-elec {
+    background-image: url('/img/card-prop-elec.svg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    height: 100%;
+    width: 100%;
+}
+
+.prop-water {
+    background-image: url('/img/card-prop-water.svg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    height: 100%;
+    width: 100%;
+}
+
+.prop-joker {
+    background-image: url('/img/card-prop-joker.svg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    height: 100%;
+    width: 100%;
+}
+
+.prop-joker-red-yellow {
+    background-image: url('/img/card-joker-red-yellow.svg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    height: 100%;
+    width: 100%;
+}
+
+.prop-joker-blue-black {
+    background-image: url('/img/card-joker-blue-black.svg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    height: 100%;
+    width: 100%;
+}
+
 .prop-title {
     position: absolute;
     top: 2rem;
     text-align: center;
     font-weight: bold;
-    width: 10rem;
-    margin-left: 1.75rem;
+    width: 7.5rem;
+    left: 4rem;
+    font-size: 0.85rem;
+    text-align: left;
+    flex-wrap: wrap;
+    display: flex;
+    line-height: normal;
 }

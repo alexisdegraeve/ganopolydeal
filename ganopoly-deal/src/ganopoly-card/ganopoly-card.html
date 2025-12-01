@@ -2,19 +2,43 @@
     <div class="card-flip" [class.flipped]="!showFront">
         <div class="front face">
             <div class="card-body">
-                @if(card?.type === CardType.propriete) {
-                <div class="prop-blue">
-                    <div class="prop-title">{{ card?.name }}</div>
+                @if(card?.type === CardType.PropertyJoker) {
+                <div [ngClass]="{
+                  'prop-joker-red-yellow': card?.setType === PropertySet.Red &&  card?.setType2 === PropertySet.Yellow,
+                  'prop-joker-blue-black': card?.setType === PropertySet.LightBlue &&  card?.setType2 === PropertySet.Railroad,
+                  'prop-joker': card?.setType === PropertySet.Multi
+                }">
                 </div>
-                } @else if (card?.type === CardType.billet) {
+                } @if(card?.type === CardType.Property) {
+                <div [ngClass]="{
+                  'prop-dark-blue': card?.setType === PropertySet.DarkBlue,
+                  'prop-brown': card?.setType === PropertySet.Brown,
+                  'prop-light-blue': card?.setType === PropertySet.LightBlue,
+                  'prop-pink': card?.setType === PropertySet.Pink,
+                  'prop-orange': card?.setType === PropertySet.Orange,
+                  'prop-red': card?.setType === PropertySet.Red,
+                  'prop-yellow': card?.setType === PropertySet.Yellow,
+                  'prop-green': card?.setType === PropertySet.Green,
+                  'prop-railroad': card?.setType === PropertySet.Railroad,
+                  'prop-elec': card?.setType === PropertySet.UtilityElec,
+                  'prop-water': card?.setType === PropertySet.UtilityWater,
+                }">
+
+                    <div class="prop-title" [ngClass]="{
+                  'text-white': card?.setType === PropertySet.Brown
+                  || card?.setType === PropertySet.Pink || card?.setType === PropertySet.Orange || card?.setType === PropertySet.Red
+                  || card?.setType === PropertySet.Railroad,
+                }">{{ card?.name }}</div>
+                </div>
+                } @else if (card?.type === CardType.Money) {
                 <div>
                     BILLET
                 </div>
-                } @else if (card?.type === CardType.action) {
+                } @else if (card?.type === CardType.Action) {
                 <div>
                     ACTION
                 </div>
-                } @else if (card?.type === CardType.propriete_joker) {
+                } @else if (card?.type === CardType.PropertyJoker) {
                 <div>
                     JOKER
                 </div>

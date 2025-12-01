@@ -42,23 +42,39 @@
 //   ) {}
 // }
 
+export enum CardType {
+  Property = 'property',
+  PropertyJoker = 'property_joker',
+  Action = 'action',
+  Rent = 'rent',
+  Money = 'money',
+  Rule = 'rule'
+}
+
+export enum PropertySet {
+  Brown = 'Brown',
+  LightBlue = 'LightBlue',
+  Pink = 'Pink',
+  Orange = 'Orange',
+  Red = 'Red',
+  Yellow = 'Yellow',
+  Green = 'Green',
+  DarkBlue = 'DarkBlue',
+  Railroad = 'Railroad',
+  UtilityElec = 'UtilityElec',
+  UtilityWater = 'UtilityWater',
+  Multi = 'Multi'
+}
 
 export interface Card {
   id: number;
   type: CardType;
   name?: string;
   value?: number;
-  set?: string;
-  set2?: string;
-  sets?: string[];
+  setType?: PropertySet;       // Color or utility/railroad
+  setType2?: PropertySet;      // For jokers: second possible set
+  sets?: PropertySet[];        // For multi-color jokers or rent cards
   valueCount?: number;
   rent?: number;
 }
-export enum CardType {
-  propriete = 'propriete',
-  propriete_joker = 'propriete_joker',
-  action = 'action',
-  loyer = 'loyer',
-  billet = 'billet',
-  regle = 'regle'
-}
+
