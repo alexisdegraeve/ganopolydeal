@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { Card, CardType, PropertySet } from '../models/card';
+import { Card, CardType, PropertySet, ActionSet } from '../models/card';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -10,10 +10,11 @@ import { CommonModule } from '@angular/common';
 })
 export class GanopolyCardComponent {
   @Input() card?: Card;
-  showFront = false;
+  showFront = true;
   selected = false;
   CardType = CardType;
   PropertySet = PropertySet;
+  ActionSet = ActionSet;
 
   toggleCard() {
     this.showFront = !this.showFront;

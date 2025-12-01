@@ -64,7 +64,24 @@ export enum PropertySet {
   Utility = 'Utility',
   UtilityElec = 'UtilityElec',
   UtilityWater = 'UtilityWater',
-  Multi = 'Multi'
+  Multi = 'Multi',
+  PassGo = 'PassGo',
+  Hotel = 'Hotel',
+  House = 'House'
+}
+
+export enum ActionSet {
+  PassGo = 'PassGo',
+  Hotel = 'Hotel',
+  House = 'House',
+  DoubleRent = 'DoubleRent',
+  Birthday = 'Birthday',
+  DealJackpot = 'DealJackpot',
+  Joker = 'Joker',
+  DealBanco ='DealBanco',
+  DealDuel = 'DealDuel',
+  DealSwap = 'DealSwap',
+
 }
 
 export interface Card {
@@ -73,7 +90,8 @@ export interface Card {
   name?: string;
   value?: number;
   setType?: PropertySet;       // Color or utility/railroad
-  setType2?: PropertySet;      // For jokers: second possible set
+  setType2?: PropertySet;
+  setAction?: ActionSet;   // For jokers: second possible set
   sets?: PropertySet[];        // For multi-color jokers or rent cards
   valueCount?: number;
   rent?: number;

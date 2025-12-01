@@ -2,7 +2,35 @@
     <div class="card-flip" [class.flipped]="!showFront">
         <div class="front face">
             <div class="card-body">
-                @if(card?.type === CardType.PropertyJoker) {
+
+                @if(card?.type === CardType.Rent) {
+                <div [ngClass]="{
+                  'prop-joker-blue-brown': card?.setType === PropertySet.LightBlue &&  card?.setType2 === PropertySet.Brown,
+                  'prop-joker-pink-orange': card?.setType === PropertySet.Pink &&  card?.setType2 === PropertySet.Orange,
+                  'prop-joker-blue-green': card?.setType === PropertySet.DarkBlue &&  card?.setType2 === PropertySet.Green,
+                  'prop-joker-green-black': card?.setType === PropertySet.Green &&  card?.setType2 === PropertySet.Railroad,
+                  'prop-joker-black-utility': card?.setType === PropertySet.Railroad &&  card?.setType2 === PropertySet.Utility,
+                  'prop-joker-blue-black': card?.setType === PropertySet.LightBlue &&  card?.setType2 === PropertySet.Railroad,
+                  'prop-joker-red-yellow': card?.setType === PropertySet.Red &&  card?.setType2 === PropertySet.Yellow,
+
+                  'prop-joker': card?.setType === PropertySet.Multi
+                }">
+                </div>
+                } @if(card?.type === CardType.Action) {
+                <div [ngClass]="{
+                  'prop-action-birthday': card?.setAction === ActionSet.Birthday,
+                  'prop-action-deal-banco': card?.setAction === ActionSet.DealBanco,
+                  'prop-action-deal-jackpot': card?.setAction === ActionSet.DealJackpot,
+                  'prop-action-deal-troc': card?.setAction === ActionSet.DealSwap,
+                  'prop-action-double-rent': card?.setAction === ActionSet.DoubleRent,
+                  'prop-action-duel': card?.setAction === ActionSet.DealDuel,
+                  'prop-action-joker': card?.setAction === ActionSet.Joker,
+                  'prop-action-hotel': card?.setAction === ActionSet.House,
+                  'prop-action-house': card?.setAction === ActionSet.Hotel,
+                  'prop-action-start': card?.setAction === ActionSet.PassGo,
+                }">
+                </div>
+                } @if(card?.type === CardType.PropertyJoker) {
                 <div [ngClass]="{
                   'prop-joker-blue-brown': card?.setType === PropertySet.LightBlue &&  card?.setType2 === PropertySet.Brown,
                   'prop-joker-pink-orange': card?.setType === PropertySet.Pink &&  card?.setType2 === PropertySet.Orange,
