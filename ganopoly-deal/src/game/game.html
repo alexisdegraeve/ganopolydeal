@@ -1,4 +1,5 @@
 <button class="btn btn-primary" (click)="newGame()">New Game</button>
+<button class="btn btn-primary" (click)="remove()">REMOVE</button>
 
 <div class="game">
 
@@ -15,7 +16,13 @@
 
     <div class="remaining">Remaing Cards @if(lastCard$ | async; as lastCard) {
         <ganopoly-card [card]="lastCard"></ganopoly-card>
-        }
+        } @if(totalCardsHuman$ | async; as total) {
+        <div>
+            <button class="btn btn-primary" (click)="takeCards(2, 'human')">Take 2 Cards </button>
+        </div>
+        } @else {
+        <button class="btn btn-primary" (click)="takeCards(5, 'human')">Take 5 Cards </button> }
+
     </div>
     }
     <div class="debug">
