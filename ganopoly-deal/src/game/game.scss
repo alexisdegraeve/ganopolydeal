@@ -1,4 +1,28 @@
-.cards {
+.game {
+    display: flex;
+    flex-wrap: wrap;
+    background-color: #000;
+    gap: 1rem;
+    padding: 1rem;
+}
+
+.player {
+    display: flex;
+    flex-wrap: wrap;
+    background-color: #000;
+    gap: 1rem;
+    padding: 1rem;
+}
+
+.remaining {
+    display: flex;
+    flex-wrap: wrap;
+    background-color: #000;
+    gap: 1rem;
+    padding: 1rem;
+}
+
+.debug {
     display: flex;
     flex-wrap: wrap;
     background-color: #000;

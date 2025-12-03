@@ -1,5 +1,28 @@
 <button class="btn btn-primary" (click)="newGame()">New Game</button>
 
-<div class="cards">
-    <ganopoly-card [card]="card" *ngFor="let card of cards$ | async"></ganopoly-card>
+<div class="game">
+
+    @if (players$ | async; as players) { @for(player of players; track $index) {
+
+
+    <div class="player">
+        {{ player.name}} @for(card of player.hand; track $index) {
+        <ganopoly-card [card]="card"></ganopoly-card>
+        }
+
+    </div>
+    } } @if (remainingDeck$ | async; as remainingDeck) {
+
+    <div class="remaining">Remaing Cards @if(lastCard$ | async; as lastCard) {
+        <ganopoly-card [card]="lastCard"></ganopoly-card>
+        }
+    </div>
+    }
+    <div class="debug">
+        Remaining DECK @if (remainingDeck$ | async; as remainingDeck) { @for(card of remainingDeck; track $index) {
+        <ganopoly-card [card]="card"></ganopoly-card>
+        } }
+    </div>
+
+
 </div>

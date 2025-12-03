@@ -10,7 +10,7 @@ import { CommonModule } from '@angular/common';
 })
 export class GanopolyCardComponent {
   @Input() card?: Card;
-  showFront = false;
+  showFront = true;
   selected = false;
   CardType = CardType;
   PropertySet = PropertySet;
