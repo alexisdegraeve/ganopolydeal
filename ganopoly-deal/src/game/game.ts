@@ -20,6 +20,7 @@ export class GameComponent {
   lastCard$ = new BehaviorSubject<Card | null>(null);
   totalCardsHuman$ = new BehaviorSubject<number>(0);
 
+
   // Fisher-Yates algorithm
   shuffle<T>(array: T[]): T[] {
     const arr = [...array]; // copie
@@ -34,13 +35,6 @@ export class GameComponent {
     const deck = this.remainingDeck$.getValue();
     return deck.length > 0 ? deck[deck.length - 1] : null;
   }
-
-  // totalCardsHuman() {
-  //   const players = this.players$.getValue();
-  //   const total = players[players.length - 1].hand.length;
-  //   this.totalCardsHuman$.next(total);
-  // }
-
 
   take2Cards() {
     const oneCard = this.drawLastCard();
@@ -95,10 +89,10 @@ export class GameComponent {
     ).subscribe(shuffleCards => {
       // Distribute cards
       const players: Player[] = [
-        { id: 1, hand: shuffleCards.slice(0, 5), name: "Alice" },
-        { id: 2, hand: shuffleCards.slice(5, 10), name: "Tom" },
-        { id: 3, hand: shuffleCards.slice(10, 15), name: "John" },
-        { id: 4, hand: shuffleCards.slice(15, 20) , name: "Human" }
+        { id: 1, hand: shuffleCards.slice(0, 5), name: "Alice", properties: [], money:[], actions: []},
+        { id: 2, hand: shuffleCards.slice(5, 10), name: "Tom", properties: [], money:[], actions: [] },
+        { id: 3, hand: shuffleCards.slice(10, 15), name: "John", properties: [], money:[], actions: [] },
+        { id: 4, hand: shuffleCards.slice(15, 20) , name: "Human", properties: [], money:[], actions: [] }
       ];
 
 
@@ -106,10 +100,6 @@ export class GameComponent {
       this.players$.next(players);
       this.remainingDeck$.next(remainingDeck);
 
-      //       const human = players.find(p => p.name.toLowerCase() === 'human');
-      // const total = human ? human.hand.length : 0;
-      // console.log('check ', total);
-      // this.totalCardsHuman$.next(total);
     })
   }
 
@@ -120,7 +110,6 @@ export class GameComponent {
   }
 
   constructor(private deckService: DeckService) {
-    //  this.cards$ = this.deckService.getCards();
     this.players$.subscribe( players => {
       console.log('je suis ici ', players);
       const human = players.find(p => p.name.toLowerCase() === 'human');
@@ -135,4 +124,84 @@ export class GameComponent {
       )
     });
   }
+
+  protected playTurn(player: Player) {
+    // 1. Poser les propriétés pour compléter les sets
+    this.playProperties(player);
+
+    // 2. Poser des billets si main trop pleine
+    this.playMoneyIfHandFull(player);
+
+    // 3. Jouer les actions offensives intelligemment
+    this.playActions(player);
+
+    // 4. Fin de tour : tirer 2 cartes si possible
+    this.drawCards(player);
+  }
+
+    private playMoneyIfHandFull(player: Player) {
+    // Si main > 5 cartes, poser les billets pour se protéger
+    if(player.hand.length > 5) {
+      const moneyCards = player.hand.filter(c => c.type === 'money');
+      moneyCards.forEach(card => this.moveCardToMoney(player, card));
+    }
+  }
+
+  private playProperties(player: Player) {
+    // Pour chaque carte propriété dans la main
+    const propertiesInHand = player.hand.filter(c => c.type === 'property');
+    propertiesInHand.forEach(card => {
+      // Si carte complète un set ou commence un set vide, poser sur table
+      if(this.canPlaceProperty(card)) {
+        this.moveCardToProperties(player, card);
+      }
+    });
+  }
+
+    private canPlaceProperty(card: Card): boolean {
+    // Vérifie si le set est vide ou si ça complète un set existant
+    return true; // Logique simple pour IA moyenne
+  }
+
+  private moveCardToProperties(player: Player, card: Card) {
+    player.hand = player.hand.filter(c => c !== card);
+    player.properties.push(card);
+  }
+
+  private moveCardToMoney(player: Player, card: Card) {
+    player.hand = player.hand.filter(c => c !== card);
+    player.money.push(card);
+  }
+
+
+  private playAction(player: Player, card: Card) {
+    player.hand = player.hand.filter(c => c !== card);
+    player.actions.push(card);
+  }
+
+  private shouldPlayAction(card: Card): boolean {
+    // IA moyenne : jouer action seulement si gain immédiat
+    return true; // Exemple simple
+  }
+
+  private playActions(player: Player) {
+    // Priorité : actions qui permettent de voler une propriété ou doubler le loyer
+    const actionCards = player.hand.filter(c => c.type === 'action');
+    actionCards.forEach(card => {
+      if(this.shouldPlayAction(card)) {
+        this.playAction(player, card);
+      }
+    });
+  }
+
+  private drawCards(player: Player) {
+    // Tirer 2 cartes si possible
+    for(let i = 0; i < 2; i++) {
+      const card = this.drawLastCard();
+      if(card) player.hand.push(card);
+    }
+  }
+
+
+
 }
