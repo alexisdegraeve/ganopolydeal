@@ -229,6 +229,7 @@ export class GameComponent {
     const human = players.find(p => p.name.toLowerCase() === 'human');
     if (!human) return;
 
+
     // 1️⃣ Move selected cards into the proper piles
     for (const card of this.selectedCards) {
 
@@ -259,6 +260,12 @@ export class GameComponent {
     // 3️⃣ Reset UI selections
     this.selectedCards = [];
 
+    // Regarde le total de carte
+    if(human.hand.length === 0 ) {
+      // Plus de carte tu en rajouttes 5 pour l'humain
+      this.takeCards(5, 'human');
+    }
+
     // 4️⃣ Save updated players
     this.players$.next(players);
 
@@ -281,13 +288,24 @@ export class GameComponent {
     if (player.name.toLowerCase() !== 'human') {
       this.playTurn(player);
       this.goToNextPlayer(); // IA joue 100% automatiquement
-    } else{
-      const cardsToDraw = Math.max(0, 2 - player.hand.length);
-      if (cardsToDraw > 0) {
-        this.takeCards(cardsToDraw, 'human');
-      }
+    } else {
+      this.takeCards(2, 'human');
+      // this.startHumanTurn();
     }
   }
+
+  // startHumanTurn() {
+  //   const players = this.players$.getValue();
+  //   const human = players.find(p => p.name.toLowerCase() === 'human');
+  //   if (!human) return;
+
+  //   const cardsToDraw = Math.max(0, 2 - human.hand.length);
+  //   if (cardsToDraw > 0) {
+  //     this.takeCards(cardsToDraw, 'human');
+  //   }
+
+  //   this.players$.next(players); // update observable pour UI
+  // }
 
 
 }
