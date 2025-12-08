@@ -1,9 +1,10 @@
-<div class="card-container" [class.selected]="selected" (click)="toggleCard()">
-    <div class="card-flip" [class.flipped]="!showFront">
-        <div class="front face">
-            <div class="card-body">
-                @if(card?.type === CardType.Money) {
-                <div [ngClass]="{
+<div class="full-card">
+    <div class="card-container" [class.selected]="selected" (click)="toggleCard()">
+        <div class="card-flip" [class.flipped]="!showFront">
+            <div class="front face">
+                <div class="card-body">
+                    @if(card?.type === CardType.Money) {
+                    <div [ngClass]="{
                   'money-one': card?.value === 1,
                   'money-two': card?.value === 2,
                   'money-three': card?.value === 3,
@@ -11,9 +12,9 @@
                   'money-five': card?.value === 5,
                   'money-ten': card?.value === 10,
                 }">
-                </div>
-                } @if(card?.type === CardType.Rent) {
-                <div [ngClass]="{
+                    </div>
+                    } @if(card?.type === CardType.Rent) {
+                    <div [ngClass]="{
                   'prop-rent-blue-brown': card?.setType === PropertySet.LightBlue &&  card?.setType2 === PropertySet.Brown,
                   'prop-rent-pink-orange': card?.setType === PropertySet.Pink &&  card?.setType2 === PropertySet.Orange,
                   'prop-rent-blue-green': card?.setType === PropertySet.DarkBlue &&  card?.setType2 === PropertySet.Green,
@@ -25,9 +26,9 @@
 
                   'prop-joker': card?.setType === PropertySet.Multi
                 }">
-                </div>
-                } @if(card?.type === CardType.Action) {
-                <div [ngClass]="{
+                    </div>
+                    } @if(card?.type === CardType.Action) {
+                    <div [ngClass]="{
                   'prop-action-birthday': card?.setAction === ActionSet.Birthday,
                   'prop-action-deal-banco': card?.setAction === ActionSet.DealBanco,
                   'prop-action-deal-jackpot': card?.setAction === ActionSet.DealJackpot,
@@ -39,9 +40,9 @@
                   'prop-action-house': card?.setAction === ActionSet.Hotel,
                   'prop-action-start': card?.setAction === ActionSet.PassGo,
                 }">
-                </div>
-                } @if(card?.type === CardType.PropertyJoker) {
-                <div [ngClass]="{
+                    </div>
+                    } @if(card?.type === CardType.PropertyJoker) {
+                    <div [ngClass]="{
                   'prop-joker-blue-brown': card?.setType === PropertySet.LightBlue &&  card?.setType2 === PropertySet.Brown,
                   'prop-joker-pink-orange': card?.setType === PropertySet.Pink &&  card?.setType2 === PropertySet.Orange,
                   'prop-joker-blue-green': card?.setType === PropertySet.DarkBlue &&  card?.setType2 === PropertySet.Green,
@@ -52,9 +53,9 @@
 
                   'prop-joker': card?.setType === PropertySet.Multi
                 }">
-                </div>
-                } @if(card?.type === CardType.Property) {
-                <div [ngClass]="{
+                    </div>
+                    } @if(card?.type === CardType.Property) {
+                    <div [ngClass]="{
                   'prop-dark-blue': card?.setType === PropertySet.DarkBlue,
                   'prop-brown': card?.setType === PropertySet.Brown,
                   'prop-light-blue': card?.setType === PropertySet.LightBlue,
@@ -68,19 +69,20 @@
                   'prop-water': card?.setType === PropertySet.UtilityWater,
                 }">
 
-                    <div class="prop-title" [ngClass]="{
+                        <div class="prop-title" [ngClass]="{
                   'text-white': card?.setType === PropertySet.Brown
                   || card?.setType === PropertySet.Pink || card?.setType === PropertySet.Orange || card?.setType === PropertySet.Red
                   || card?.setType === PropertySet.Railroad,
                 }">{{ card?.name }}</div>
+                    </div>
+                    }
                 </div>
-                }
             </div>
-        </div>
 
-        <div class="back face ">
-        </div>
+            <div class="back face ">
+            </div>
 
+        </div>
     </div>
+    <button type="button" class="mt-4 btn btn-outline-danger" (click)="toggleSelected() "><i class="bi bi-hand-index-fill"></i> Pick</button>
 </div>
-<button (click)="toggleSelected() ">Select</button>

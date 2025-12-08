@@ -1,3 +1,9 @@
+.full-card {
+    justify-content: center;
+    display: flex;
+    flex-direction: column;
+}
+
 .card-container {
     perspective: 1000px;
     /* profondeur 3D */
