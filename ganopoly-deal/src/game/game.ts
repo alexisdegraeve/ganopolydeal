@@ -19,6 +19,7 @@ export class GameComponent {
   remainingDeck$ = new BehaviorSubject<Card[]>([]);
   lastCard$ = new BehaviorSubject<Card | null>(null);
   totalCardsHuman$ = new BehaviorSubject<number>(0);
+  selectedCards: Card[] = [];
 
 
   // Fisher-Yates algorithm
@@ -203,5 +204,17 @@ export class GameComponent {
   }
 
 
+  onCardSelectionChange(event: {card: Card, selected: boolean}) {
+    console.log('onCardSelectionChange' , event)
+     if (event.selected) {
+          this.selectedCards.push(event.card);
+      } else {
+          this.selectedCards = this.selectedCards.filter(c => c.id !== event.card.id);
+      }
+  }
+
+  endturn() {
+    console.log('Fin du tour de l\'humain');
+  }
 
 }

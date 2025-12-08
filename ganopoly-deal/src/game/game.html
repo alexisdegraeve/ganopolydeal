@@ -11,10 +11,14 @@
 
         @if(player.name.toLowerCase() === 'human') { @for(card of player.hand; track $index) {
         <div class="player-cards">
-            <ganopoly-card [card]="card"></ganopoly-card>
+            <ganopoly-card [card]="card" (selectionChange)="onCardSelectionChange($event)"></ganopoly-card>
         </div>
 
-        } }
+        } @if (selectedCards.length > 3) {
+        <p class="text-danger">Max 3 cards selected</p>
+        }
+
+        <button [disabled]="selectedCards.length > 3" class="btn btn-primary" (click)="endturn()">END TURN</button> }
 
         <div class="player-money"> Notes @for(card of player.money; track $index) {
             <ganopoly-card [card]="card"></ganopoly-card>

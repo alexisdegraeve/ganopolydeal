@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Card, CardType, PropertySet, ActionSet } from '../models/card';
 import { CommonModule } from '@angular/common';
 
@@ -10,6 +10,7 @@ import { CommonModule } from '@angular/common';
 })
 export class GanopolyCardComponent {
   @Input() card?: Card;
+  @Output() selectionChange = new EventEmitter<{card: Card, selected: boolean}>();
   showFront = true;
   selected = false;
   CardType = CardType;
@@ -21,6 +22,7 @@ export class GanopolyCardComponent {
   }
 
   toggleSelected() {
-    this.selected = !this.selected;
+     this.selected = !this.selected;
+     if(this.card) this.selectionChange.emit({ card: this.card, selected: this.selected });
   }
 }
