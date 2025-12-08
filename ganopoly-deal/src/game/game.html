@@ -31,6 +31,12 @@
 
         </div>
 
+        <div class="player-actions"> Actions @for(card of player.actions; track $index) {
+            <ganopoly-card [card]="card"></ganopoly-card>
+            }
+
+        </div>
+
     </div>
     } } @if (remainingDeck$ | async; as remainingDeck) {
 

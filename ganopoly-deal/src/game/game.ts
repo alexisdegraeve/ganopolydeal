@@ -3,7 +3,7 @@ import { DeckService } from '../app/services/deck';
 import { BehaviorSubject, map, Observable } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { GanopolyCardComponent } from '../ganopoly-card/ganopoly-card';
-import { Card } from '../models/card';
+import { Card, CardType } from '../models/card';
 import { Player } from '../models/player';
 
 @Component({
@@ -78,7 +78,7 @@ export class GameComponent {
 
   remove() {
     const players = this.players$.getValue();
-    players[players.length-1].hand.pop();
+    players[players.length - 1].hand.pop();
     this.players$.next(players);
   }
 
@@ -90,10 +90,10 @@ export class GameComponent {
     ).subscribe(shuffleCards => {
       // Distribute cards
       const players: Player[] = [
-        { id: 1, hand: shuffleCards.slice(0, 5), name: "Alice", properties: [], money:[], actions: []},
-        { id: 2, hand: shuffleCards.slice(5, 10), name: "Tom", properties: [], money:[], actions: [] },
-        { id: 3, hand: shuffleCards.slice(10, 15), name: "John", properties: [], money:[], actions: [] },
-        { id: 4, hand: shuffleCards.slice(15, 20) , name: "Human", properties: [], money:[], actions: [] }
+        { id: 1, hand: shuffleCards.slice(0, 5), name: "Alice", properties: [], money: [], actions: [] },
+        { id: 2, hand: shuffleCards.slice(5, 10), name: "Tom", properties: [], money: [], actions: [] },
+        { id: 3, hand: shuffleCards.slice(10, 15), name: "John", properties: [], money: [], actions: [] },
+        { id: 4, hand: shuffleCards.slice(15, 20), name: "Human", properties: [], money: [], actions: [] }
       ];
 
 
@@ -111,7 +111,7 @@ export class GameComponent {
   }
 
   constructor(private deckService: DeckService) {
-    this.players$.subscribe( players => {
+    this.players$.subscribe(players => {
       console.log('je suis ici ', players);
       const human = players.find(p => p.name.toLowerCase() === 'human');
       const total = human ? human.hand.length : 0;
@@ -140,9 +140,9 @@ export class GameComponent {
     this.drawCards(player);
   }
 
-    private playMoneyIfHandFull(player: Player) {
+  private playMoneyIfHandFull(player: Player) {
     // Si main > 5 cartes, poser les billets pour se protéger
-    if(player.hand.length > 5) {
+    if (player.hand.length > 5) {
       const moneyCards = player.hand.filter(c => c.type === 'money');
       moneyCards.forEach(card => this.moveCardToMoney(player, card));
     }
@@ -153,13 +153,13 @@ export class GameComponent {
     const propertiesInHand = player.hand.filter(c => c.type === 'property');
     propertiesInHand.forEach(card => {
       // Si carte complète un set ou commence un set vide, poser sur table
-      if(this.canPlaceProperty(card)) {
+      if (this.canPlaceProperty(card)) {
         this.moveCardToProperties(player, card);
       }
     });
   }
 
-    private canPlaceProperty(card: Card): boolean {
+  private canPlaceProperty(card: Card): boolean {
     // Vérifie si le set est vide ou si ça complète un set existant
     return true; // Logique simple pour IA moyenne
   }
@@ -189,7 +189,7 @@ export class GameComponent {
     // Priorité : actions qui permettent de voler une propriété ou doubler le loyer
     const actionCards = player.hand.filter(c => c.type === 'action');
     actionCards.forEach(card => {
-      if(this.shouldPlayAction(card)) {
+      if (this.shouldPlayAction(card)) {
         this.playAction(player, card);
       }
     });
@@ -197,24 +197,69 @@ export class GameComponent {
 
   private drawCards(player: Player) {
     // Tirer 2 cartes si possible
-    for(let i = 0; i < 2; i++) {
+    for (let i = 0; i < 2; i++) {
       const card = this.drawLastCard();
-      if(card) player.hand.push(card);
+      if (card) player.hand.push(card);
     }
   }
 
 
-  onCardSelectionChange(event: {card: Card, selected: boolean}) {
-    console.log('onCardSelectionChange' , event)
-     if (event.selected) {
-          this.selectedCards.push(event.card);
-      } else {
-          this.selectedCards = this.selectedCards.filter(c => c.id !== event.card.id);
-      }
+  onCardSelectionChange(event: { card: Card, selected: boolean }) {
+    console.log('onCardSelectionChange', event)
+    if (event.selected) {
+      this.selectedCards.push(event.card);
+    } else {
+      this.selectedCards = this.selectedCards.filter(c => c.id !== event.card.id);
+    }
   }
+
+
 
   endturn() {
     console.log('Fin du tour de l\'humain');
+    const players = [...this.players$.getValue()];
+
+    // Find human player
+    const human = players.find(p => p.name.toLowerCase() === 'human');
+    if (!human) return;
+
+    // 1️⃣ Move selected cards into the proper piles
+    for (const card of this.selectedCards) {
+
+      switch (card.type) {
+
+        case CardType.Property:
+          human.properties.push(card);
+          break;
+
+        case CardType.Money:
+          human.money.push(card);
+          break;
+
+        case CardType.Action:
+          // You can either:
+          // - place into a global discard pile
+          // - or store actions played by human
+          human.actions.push(card);
+          break;
+      }
+    }
+
+    // 2️⃣ Remove selected cards from the human hand
+    human.hand = human.hand.filter(
+      c => !this.selectedCards.some(s => s.id === c.id)
+    );
+
+    // 3️⃣ Reset UI selections
+    this.selectedCards = [];
+
+    // 4️⃣ Save updated players
+    this.players$.next(players);
+
+    // 5️⃣ Pass turn to next player (AI)
+    //this.playNextAITurn();
+    // Joueur suivant
   }
+
 
 }
