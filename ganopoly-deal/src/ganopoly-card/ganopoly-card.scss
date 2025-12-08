@@ -10,12 +10,13 @@
     width: 13.188rem;
     height: 20.5rem;
     cursor: pointer;
+    border: 0.25rem solid transparent;
+    border-radius: 1rem;
     &.selected {
-        box-shadow: 0 0 20px 5px rgba(255, 215, 0, 0.8);
+        border-color: red;
         /* halo doré */
-        transform: scale(1.05);
         /* léger zoom pour feedback */
-        transition: all 0.2s ease-in-out;
+        transition: border-color 0.5s ease-in-out;
     }
 }
 

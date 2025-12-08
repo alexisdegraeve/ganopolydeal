@@ -84,5 +84,5 @@
 
         </div>
     </div>
-    <button type="button" class="mt-4 btn btn-outline-danger" (click)="toggleSelected() "><i class="bi bi-hand-index-fill"></i> Pick</button>
+    <button type="button" [class.btn-danger]="selected" [class.btn-outline-danger]="!selected" class="mt-4 btn" (click)="toggleSelected() "><i class="bi bi-hand-index-fill"></i> {{ !selected ? 'Take' : 'Skip' }}</button>
 </div>
