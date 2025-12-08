@@ -20,6 +20,7 @@ export class GameComponent {
   lastCard$ = new BehaviorSubject<Card | null>(null);
   totalCardsHuman$ = new BehaviorSubject<number>(0);
   selectedCards: Card[] = [];
+  currentPlayerIndex = new BehaviorSubject<number>(0);
 
 
   // Fisher-Yates algorithm
@@ -99,6 +100,7 @@ export class GameComponent {
 
       const remainingDeck = shuffleCards.slice(20);
       this.players$.next(players);
+      this.currentPlayerIndex.next(3);
       this.remainingDeck$.next(remainingDeck);
 
     })
@@ -207,9 +209,13 @@ export class GameComponent {
   onCardSelectionChange(event: { card: Card, selected: boolean }) {
     console.log('onCardSelectionChange', event)
     if (event.selected) {
-      this.selectedCards.push(event.card);
+      if (!this.selectedCards.some(c => c.id === event.card.id)) {
+        this.selectedCards.push(event.card);
+      }
     } else {
-      this.selectedCards = this.selectedCards.filter(c => c.id !== event.card.id);
+      this.selectedCards = this.selectedCards.filter(
+        c => c.id !== event.card.id
+      );
     }
   }
 
@@ -259,6 +265,28 @@ export class GameComponent {
     // 5️⃣ Pass turn to next player (AI)
     //this.playNextAITurn();
     // Joueur suivant
+    this.goToNextPlayer();
+  }
+
+  goToNextPlayer() {
+    let index = this.currentPlayerIndex.getValue();
+
+    // rotate to next
+    index = (index + 1) % this.players$.getValue().length;
+    this.currentPlayerIndex.next(index);
+
+    const players = this.players$.getValue();
+    const player = players[index];
+
+    if (player.name.toLowerCase() !== 'human') {
+      this.playTurn(player);
+      this.goToNextPlayer(); // IA joue 100% automatiquement
+    } else{
+      const cardsToDraw = Math.max(0, 2 - player.hand.length);
+      if (cardsToDraw > 0) {
+        this.takeCards(cardsToDraw, 'human');
+      }
+    }
   }
 
 
