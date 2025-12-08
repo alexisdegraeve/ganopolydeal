@@ -16,6 +16,7 @@ export class GanopolyCardComponent {
   CardType = CardType;
   PropertySet = PropertySet;
   ActionSet = ActionSet;
+  @Input() readOnly = true;
 
   toggleCard() {
     this.showFront = !this.showFront;

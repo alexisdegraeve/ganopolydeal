@@ -47,9 +47,13 @@
     display: flex;
     flex-direction: column;
     flex-wrap: wrap;
-    background-color: #000;
     gap: 1rem;
     padding: 1rem;
+    .title {
+        font-size: 1.2rem;
+        color: red;
+        font-weight: bold;
+    }
 }
 
 .debug {

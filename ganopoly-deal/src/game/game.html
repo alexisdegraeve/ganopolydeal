@@ -15,7 +15,7 @@
         <div class="player-cards ">
             @for(card of player.hand; track $index) {
 
-            <ganopoly-card [card]="card " (selectionChange)="onCardSelectionChange($event) "></ganopoly-card>
+            <ganopoly-card [readOnly]="false" [card]="card " (selectionChange)="onCardSelectionChange($event) "></ganopoly-card>
 
 
             }
@@ -52,22 +52,23 @@
     </div>
     } } @if (startGame && (remainingDeck$ | async); as remainingDeck) {
 
-    <div class="remaining">Remaing Cards @if(lastCard$ | async; as lastCard) {
+    <div class="remaining"><span class="title">Draw pile</span> @if(lastCard$ | async; as lastCard) {
         <ganopoly-card [card]="lastCard"></ganopoly-card>
-        } @if(totalCardsHuman$ | async; as total) {
+        }
+        <!-- @if(totalCardsHuman$ | async; as total) {
         <div>
             <button class="btn btn-primary" (click)="takeCards(2, 'human')">Take 2 Cards </button>
         </div>
         } @else {
-        <button class="btn btn-primary" (click)="takeCards(5, 'human')">Take 5 Cards </button> }
+        <button class="btn btn-primary" (click)="takeCards(5, 'human')">Take 5 Cards </button> } -->
 
     </div>
     }
-    <div class="debug">
+    <!-- <div class="debug">
         Remaining DECK @if (remainingDeck$ | async; as remainingDeck) { @for(card of remainingDeck; track $index) {
         <ganopoly-card [card]="card"></ganopoly-card>
         } }
-    </div>
+    </div> -->
 
 </div>
 }
