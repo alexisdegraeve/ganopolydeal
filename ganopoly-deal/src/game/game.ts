@@ -5,10 +5,11 @@ import { CommonModule } from '@angular/common';
 import { GanopolyCardComponent } from '../ganopoly-card/ganopoly-card';
 import { Card, CardType } from '../models/card';
 import { Player } from '../models/player';
+import { HeaderComponent } from '../header/header';
 
 @Component({
   selector: 'app-game',
-  imports: [CommonModule, GanopolyCardComponent],
+  imports: [CommonModule, GanopolyCardComponent, HeaderComponent],
   templateUrl: './game.html',
   styleUrl: './game.scss',
 })
@@ -21,6 +22,7 @@ export class GameComponent {
   totalCardsHuman$ = new BehaviorSubject<number>(0);
   selectedCards: Card[] = [];
   currentPlayerIndex = new BehaviorSubject<number>(0);
+  startGame = false;
 
 
   // Fisher-Yates algorithm
@@ -109,6 +111,7 @@ export class GameComponent {
 
   newGame() {
     console.log('New Game');
+    this.startGame = true;
     this.initializeCards();
   }
 

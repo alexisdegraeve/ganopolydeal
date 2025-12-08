@@ -1,45 +1,47 @@
-<button class="btn btn-primary" (click)="newGame()">New Game</button>
-<button class="btn btn-primary" (click)="remove()">REMOVE</button>
+<app-header></app-header>
+<button class="btn btn-outline-dark" (click)="newGame()">New Game</button>
+<!-- <button class="btn btn-primary" (click)="remove()">REMOVE</button> -->
 
-<div class="game">
+@if (startGame) {
+<div class="game ">
 
     @if (players$ | async; as players) { @for(player of players; track $index) {
 
 
-    <div class="player">
-        <div class="player-name">{{ player.name}}</div>
+    <div class="player ">
+        <div class="player-name "><span class="name">{{ player.name}}</span> You can find the notes and properties of the player</div>
 
         @if(player.name.toLowerCase() === 'human') { @for(card of player.hand; track $index) {
-        <div class="player-cards">
-            <ganopoly-card [card]="card" (selectionChange)="onCardSelectionChange($event)"></ganopoly-card>
+        <div class="player-cards ">
+            <ganopoly-card [card]="card " (selectionChange)="onCardSelectionChange($event) "></ganopoly-card>
         </div>
 
         } @if (selectedCards.length > 3) {
-        <p class="text-danger">Max 3 cards selected</p>
+        <p class="text-danger ">Max 3 cards selected</p>
         } @if (selectedCards.length === 0) {
-        <p class="text-danger">No Card selected</p>
-        } @if((currentPlayerIndex | async) === 3) {<button [disabled]="selectedCards.length === 0 ||selectedCards.length > 3" class="btn btn-primary" (click)="endturn()">END TURN</button> } }
+        <p class="text-danger ">No Card selected</p>
+        } @if((currentPlayerIndex | async) === 3) {<button [disabled]="selectedCards.length===0 ||selectedCards.length> 3" class="btn btn-primary" (click)="endturn()">END TURN</button> } }
 
 
-        <div class="player-money"> Notes @for(card of player.money; track $index) {
+        <div class="player-money"> <span class="title">Notes</span> @for(card of player.money; track $index) {
             <ganopoly-card [card]="card"></ganopoly-card>
             }
 
         </div>
-        <div class="player-properties"> Properties @for(card of player.properties; track $index) {
+        <div class="player-properties"> <span class="title">Properties</span> @for(card of player.properties; track $index) {
             <ganopoly-card [card]="card"></ganopoly-card>
             }
 
         </div>
 
-        <div class="player-actions"> Actions @for(card of player.actions; track $index) {
+        <div class="player-actions"><span class="title">Actions</span> @for(card of player.actions; track $index) {
             <ganopoly-card [card]="card"></ganopoly-card>
             }
 
         </div>
 
     </div>
-    } } @if (remainingDeck$ | async; as remainingDeck) {
+    } } @if (startGame && (remainingDeck$ | async); as remainingDeck) {
 
     <div class="remaining">Remaing Cards @if(lastCard$ | async; as lastCard) {
         <ganopoly-card [card]="lastCard"></ganopoly-card>
@@ -58,5 +60,5 @@
         } }
     </div>
 
-
 </div>
+}

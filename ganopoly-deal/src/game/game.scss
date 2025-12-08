@@ -1,20 +1,25 @@
 .game {
     display: flex;
-    background-color: #000;
     gap: 1rem;
     padding: 1rem;
     flex-direction: column;
-    color: #fff;
+    color: #000;
 }
 
 .player {
     display: flex;
-    background-color: #000;
     gap: 1rem;
     padding: 1rem;
     flex-wrap: wrap;
+    flex-direction: column;
     .player-name {
-        display: flex;
+        font-size: 1rem;
+        ;
+        .name {
+            display: flex;
+            font-weight: bold;
+            font-size: 1.4rem;
+        }
     }
     .player-properties {
         display: flex;
@@ -22,6 +27,15 @@
     .player-cards {
         display: flex;
         flex-wrap: wrap;
+    }
+    .player-actions,
+    .player-properties,
+    .player-money {
+        .title {
+            font-size: 1.2rem;
+            color: red;
+            font-weight: bold;
+        }
     }
 }
 

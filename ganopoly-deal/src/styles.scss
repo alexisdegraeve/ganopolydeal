@@ -1,1 +1,8 @@
-/* You can add global styles to this file, and also import other style files */
+$light-green: #cee8d0;
+body {
+    background-color: $light-green;
+}
+
+* {
+    font-family: 'Raleway', sans-serif;
+}
