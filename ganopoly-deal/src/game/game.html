@@ -7,9 +7,25 @@
 
 
     <div class="player">
-        {{ player.name}} @for(card of player.hand; track $index) {
-        <ganopoly-card [card]="card"></ganopoly-card>
-        }
+        <div class="player-name">{{ player.name}}</div>
+
+        @if(player.name.toLowerCase() === 'human') { @for(card of player.hand; track $index) {
+        <div class="player-cards">
+            <ganopoly-card [card]="card"></ganopoly-card>
+        </div>
+
+        } }
+
+        <div class="player-money"> Notes @for(card of player.money; track $index) {
+            <ganopoly-card [card]="card"></ganopoly-card>
+            }
+
+        </div>
+        <div class="player-properties"> Properties @for(card of player.properties; track $index) {
+            <ganopoly-card [card]="card"></ganopoly-card>
+            }
+
+        </div>
 
     </div>
     } } @if (remainingDeck$ | async; as remainingDeck) {

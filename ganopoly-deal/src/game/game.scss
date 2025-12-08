@@ -1,17 +1,28 @@
 .game {
     display: flex;
-    flex-wrap: wrap;
     background-color: #000;
     gap: 1rem;
     padding: 1rem;
+    flex-direction: column;
+    color: #fff;
 }
 
 .player {
     display: flex;
-    flex-wrap: wrap;
     background-color: #000;
     gap: 1rem;
     padding: 1rem;
+    flex-wrap: wrap;
+    .player-name {
+        display: flex;
+    }
+    .player-properties {
+        display: flex;
+    }
+    .player-cards {
+        display: flex;
+        flex-wrap: wrap;
+    }
 }
 
 .remaining {
