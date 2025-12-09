@@ -6,10 +6,11 @@ import { GanopolyCardComponent } from '../ganopoly-card/ganopoly-card';
 import { Card, CardType } from '../models/card';
 import { Player } from '../models/player';
 import { HeaderComponent } from '../header/header';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-game',
-  imports: [CommonModule, GanopolyCardComponent, HeaderComponent],
+  imports: [CommonModule, GanopolyCardComponent, RouterModule],
   templateUrl: './game.html',
   styleUrl: './game.scss',
 })

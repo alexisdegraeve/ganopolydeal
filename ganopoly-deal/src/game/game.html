@@ -1,8 +1,7 @@
-<app-header></app-header>
 @if (!startGame) {
 <div class="options">
     <button class="btn btn-danger" (click)="newGame()">New Game</button>
-    <button class="btn btn-danger" (click)="newGame()">Rules</button>
+    <button class="btn btn-danger" [routerLink]="['/rules']">Rules</button>
     <!-- <button class="btn btn-primary" (click)="remove()">REMOVE</button> -->
 </div>
 } @if (startGame) {
