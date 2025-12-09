@@ -297,6 +297,10 @@ export class GameComponent {
     }
   }
 
+  stopGame() {
+    this.startGame = false;
+  }
+
   // startHumanTurn() {
   //   const players = this.players$.getValue();
   //   const human = players.find(p => p.name.toLowerCase() === 'human');
