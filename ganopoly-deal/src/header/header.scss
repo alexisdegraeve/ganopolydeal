@@ -1,0 +1,17 @@
+header {
+    width: 100%;
+    height: 20rem;
+    background: #3E4B7B;
+    clip-path: polygon(0% 0%, 100% 0%, 92% 78%, 0% 100%);
+    -webkit-clip-path: polygon(0% 0%, 100% 0%, 100% 78%, 0% 100%);
+    padding-top: 2rem;
+}
+
+.logo-ganopoly {
+    background-image: url('/img/logo-ganopoly-deal.svg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    height: 16rem;
+    width: auto;
+}
