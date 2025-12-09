@@ -15,7 +15,7 @@
 
 
     <div class="player ">
-        <div class="player-name "><span class="name">{{ player.name}}</span> You can find the notes and properties of the player</div>
+        <div class="player-name "><span class="name">{{ player.name}}</span> You can find money, properties, and action cards.</div>
 
         @if(player.name.toLowerCase() === 'human') {
         <div class="player-cards ">
@@ -38,7 +38,7 @@
         }
 
 
-        <div class="player-money"> <span class="title">Notes</span> @for(card of player.money; track $index) {
+        <div class="player-money"> <span class="title">Money</span> @for(card of player.money; track $index) {
             <ganopoly-card [card]="card"></ganopoly-card>
             }
 
