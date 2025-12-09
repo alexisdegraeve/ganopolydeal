@@ -59,7 +59,8 @@
     </div>
     } } @if (startGame && (remainingDeck$ | async); as remainingDeck) {
 
-    <div class="remaining"><span class="title">Draw pile</span> @if(lastCard$ | async; as lastCard) {
+    <div class="player">
+        <div class="player-name"><span class="name">Draw pile</span></div> @if(lastCard$ | async; as lastCard) {
         <ganopoly-card [card]="lastCard"></ganopoly-card>
         }
         <!-- @if(totalCardsHuman$ | async; as total) {
