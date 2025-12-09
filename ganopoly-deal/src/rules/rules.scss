@@ -1,8 +1,45 @@
-    h2 {
-        font-weight: bold;
-    }
+.rules {
+    margin: 2rem;
+}
 
-    h3 {
-        color: red;
-        font-weight: bold;
+.deal-rules {
+    background-color: #fff;
+    border-left: 1rem solid red;
+    padding-left: 1rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    margin-top: 3rem;
+    justify-self: flex-start;
+    padding-right: 1rem;
+}
+
+.objective {
+    background-color: #fff;
+    border-left: 1rem solid blue;
+    padding-left: 1rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    justify-self: flex-start;
+    padding-right: 1rem;
+}
+
+h2 {
+    font-weight: bold;
+}
+
+h4 {
+    color: red;
+    font-weight: bold;
+}
+
+.types {
+    margin-left: 2rem;
+}
+
+h3 {
+    font-weight: bold;
+    font-size: 1.25rem;
+    .nb {
+        font-size: 3rem;
     }
+}
