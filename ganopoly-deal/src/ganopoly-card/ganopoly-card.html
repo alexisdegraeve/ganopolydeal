@@ -85,7 +85,7 @@
         </div>
     </div>
     @if(!readOnly) { @if(card?.type === CardType.Action || card?.type === CardType.Rent ) { @if(card) {
-    <div class="btn-group" role="group" aria-label="Card selection">
+    <div class="btn-group mt-2" role="group" aria-label="Card selection">
         <!-- Not Picked -->
         <input type="radio" class="btn-check" name="card-{{card.id}}" id="not-picked-{{card.id}}" [checked]="!selected" (change)="onCardStateChange('not-picked')">
         <label class="btn btn-outline-dark" for="not-picked-{{card.id}}">Skip</label>
@@ -119,7 +119,7 @@
 
     } } } @else {
 
-    <div class="btn-group" role="group" aria-label="Take or Skip">
+    <div class="btn-group mt-2" role="group" aria-label="Take or Skip">
 
         <!-- Skip -->
         <input type="radio" class="btn-check" name="pickState-{{card?.id}}" id="skip-{{card?.id}}" [checked]="!selected" (change)="onPickStateChange(false)">

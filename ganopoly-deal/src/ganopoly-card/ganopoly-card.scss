@@ -12,7 +12,6 @@
     cursor: pointer;
     border: 0.25rem solid transparent;
     border-radius: 1rem;
-    box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
     &.selected {
         border-color: red;
         /* halo doré */
@@ -464,4 +463,10 @@
     flex-wrap: wrap;
     display: flex;
     line-height: normal;
+}
+
+.back,
+.front {
+    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+    border-radius: 1rem;
 }
