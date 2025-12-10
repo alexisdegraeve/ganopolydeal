@@ -59,17 +59,12 @@
 
         </div>
 
-        <div class="player-actions"><span class="title">Actions</span> @for(card of player.actions; track $index) {
-            <ganopoly-card [card]="card"></ganopoly-card>
-            }
-
-        </div>
 
     </div>
     } } @if (startGame && (remainingDeck$ | async); as remainingDeck) {
 
     <div class="player">
-        <div class="player-name"><span class="name">Draw pile</span></div> @if(lastCard$ | async; as lastCard) {
+        <div class="player-name"><span class="name">Draw Pile</span></div> @if(lastCard$ | async; as lastCard) {
         <ganopoly-card [card]="lastCard"></ganopoly-card>
         }
         <!-- @if(totalCardsHuman$ | async; as total) {
@@ -83,7 +78,7 @@
     }
 
     <div class="player">
-        <div class="player-name"><span class="name">Actions</span></div> @if(lastActionCard$ | async; as lastActionCard) {
+        <div class="player-name"><span class="name">Action Pile</span></div> @if(lastActionCard$ | async; as lastActionCard) {
         <ganopoly-card [card]="lastActionCard"></ganopoly-card>
         }
         <!-- @if(totalCardsHuman$ | async; as total) {
