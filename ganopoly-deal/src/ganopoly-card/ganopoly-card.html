@@ -1,5 +1,5 @@
 <div class="full-card">
-    <div class="card-container" [class.selected]="selected" (click)="clickable && toggleCard()">
+    <div class="card-container" [class.readonly]="readOnly" [class.selected]="selected" (click)="clickable && toggleCard()">
         <div class="card-flip" [class.flipped]="!showFront">
             <div class="front face">
                 <div class="card-body">

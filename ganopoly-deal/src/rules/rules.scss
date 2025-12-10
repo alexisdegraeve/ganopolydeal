@@ -1,26 +1,50 @@
+.circle-red {
+    background-color: red;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    color: #fff;
+    font-weight: bold;
+    height: 1.5rem;
+    width: 1.5rem;
+    font-size: 1.25rem;
+    justify-content: center;
+}
+
 .rules {
     margin: 2rem;
+    max-width: 50%;
+    justify-content: center;
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .deal-rules {
     background-color: #fff;
-    border-left: 1rem solid red;
-    padding-left: 1rem;
-    padding-top: 0.5rem;
-    padding-bottom: 0.5rem;
     margin-top: 3rem;
-    justify-self: flex-start;
     padding-right: 1rem;
+    border: 0.15rem solid black;
+    .block-left {
+        border-left: 1rem solid red;
+        padding-left: 1rem;
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+    }
 }
 
 .objective {
     background-color: #fff;
-    border-left: 1rem solid blue;
-    padding-left: 1rem;
-    padding-top: 0.5rem;
-    padding-bottom: 0.5rem;
-    justify-self: flex-start;
     padding-right: 1rem;
+    border: 0.15rem solid black;
+    .block-left {
+        border-left: 1rem solid blue;
+        padding-left: 1rem;
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+    }
 }
 
 h2 {
@@ -41,5 +65,12 @@ h3 {
     font-size: 1.25rem;
     .nb {
         font-size: 3rem;
+    }
+}
+
+@media only screen and (max-width: 768px) {
+    .rules {
+        max-width: 100%;
+        padding: 1rem;
     }
 }
