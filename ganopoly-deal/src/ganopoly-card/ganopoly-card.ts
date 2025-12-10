@@ -11,6 +11,7 @@ import { CommonModule } from '@angular/common';
 export class GanopolyCardComponent {
   @Input() card?: Card;
   @Output() selectionChange = new EventEmitter<{card: Card, selected: boolean}>();
+  @Output() actionCardChange = new EventEmitter<{card: Card, playAction: boolean}>();
   @Input() showFront = true;
   selected = false;
   CardType = CardType;
@@ -27,4 +28,28 @@ export class GanopolyCardComponent {
      this.selected = !this.selected;
      if(this.card) this.selectionChange.emit({ card: this.card, selected: this.selected });
   }
+
+  onCardStateChange(state: 'not-picked' | 'money' | 'action') {
+    if (!this.card) return;
+
+    if (state === 'not-picked') {
+      this.selected = false;   // non jouée
+    } else {
+      this.selected = true;    // jouée
+      this.card.playAction = (state === 'action'); // true si action, false si money
+    }
+
+    // Émettre au parent
+    this.selectionChange.emit({ card: this.card, selected: this.selected });
+  }
+
+  onPickStateChange(take: boolean) {
+  this.selected = take;
+
+  if (this.card) {
+    this.selected = take;   // synchronise l’état avec l’objet carte
+    this.selectionChange.emit({ card: this.card, selected: take });
+  }
+}
+
 }

@@ -84,6 +84,37 @@
 
         </div>
     </div>
-    @if(!readOnly) {
-    <button type="button" [class.btn-danger]="selected" [class.btn-outline-danger]="!selected" class="mt-4 btn" (click)="toggleSelected() "><i class="bi bi-hand-index-fill"></i> {{ !selected ? 'Take' : 'Skip' }}</button> }
+    @if(!readOnly) { @if(card?.type === CardType.Action || card?.type === CardType.Rent ) { @if(card) {
+    <div class="btn-group" role="group" aria-label="Card selection">
+        <!-- Not Picked -->
+        <input type="radio" class="btn-check" name="card-{{card.id}}" id="not-picked-{{card.id}}" [checked]="!selected" (change)="onCardStateChange('not-picked')">
+        <label class="btn btn-outline-secondary" for="not-picked-{{card.id}}">Skip</label>
+
+        <!-- Money -->
+        <input type="radio" class="btn-check" name="card-{{card.id}}" id="money-{{card.id}}" [checked]="selected && !card.playAction" (change)="onCardStateChange('money')">
+        <label class="btn btn-outline-success" for="money-{{card.id}}">Money</label>
+
+        <!-- Action -->
+        <input type="radio" class="btn-check" name="card-{{card.id}}" id="action-{{card.id}}" [checked]="selected && card.playAction" (change)="onCardStateChange('action')">
+        <label class="btn btn-outline-primary" for="action-{{card.id}}">Action</label>
+    </div>
+
+    } } @else {
+
+    <div class="btn-group" role="group" aria-label="Take or Skip">
+
+        <!-- Skip -->
+        <input type="radio" class="btn-check" name="pickState-{{card?.id}}" id="skip-{{card?.id}}" [checked]="!selected" (change)="onPickStateChange(false)">
+        <label class="btn btn-outline-secondary" for="skip-{{card?.id}}">
+    Skip
+  </label>
+
+        <!-- Take -->
+        <input type="radio" class="btn-check" name="pickState-{{card?.id}}" id="take-{{card?.id}}" [checked]="selected" (change)="onPickStateChange(true)">
+        <label class="btn btn-outline-success" for="take-{{card?.id}}">
+    <i class="bi bi-hand-index-fill"></i>  Take
+  </label>
+
+    </div>
+    } }
 </div>

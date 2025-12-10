@@ -97,11 +97,11 @@ export class GameComponent {
         { id: 1, hand: shuffleCards.slice(0, 5), name: "Alice", properties: [], money: [], actions: [] },
         { id: 2, hand: shuffleCards.slice(5, 10), name: "Tom", properties: [], money: [], actions: [] },
         { id: 3, hand: shuffleCards.slice(10, 15), name: "John", properties: [], money: [], actions: [] },
-        { id: 4, hand: shuffleCards.slice(15, 20), name: "Human", properties: [], money: [], actions: [] }
+        { id: 4, hand: shuffleCards.slice(15, 22), name: "Human", properties: [], money: [], actions: [] } // + 2Cards
       ];
 
 
-      const remainingDeck = shuffleCards.slice(20);
+      const remainingDeck = shuffleCards.slice(22);
       this.players$.next(players);
       this.currentPlayerIndex.next(3);
       this.remainingDeck$.next(remainingDeck);
@@ -224,7 +224,6 @@ export class GameComponent {
   }
 
 
-
   endturn() {
     console.log('Fin du tour de l\'humain');
     const players = [...this.players$.getValue()];
@@ -234,6 +233,7 @@ export class GameComponent {
     if (!human) return;
 
 
+    console.log('CHECK ', this.selectedCards);
     // 1️⃣ Move selected cards into the proper piles
     for (const card of this.selectedCards) {
 

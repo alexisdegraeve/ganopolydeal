@@ -95,5 +95,6 @@ export interface Card {
   sets?: PropertySet[];        // For multi-color jokers or rent cards
   valueCount?: number;
   rent?: number;
+  playAction?: boolean;
 }
 
