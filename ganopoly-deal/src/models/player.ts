@@ -6,5 +6,6 @@ export interface Player {
   name: string;
   properties: Card[],
   money: Card[],
-  actions: Card[]
+  actions: Card[],
+  doubleRent?: boolean;
 }

@@ -3,7 +3,7 @@ import { DeckService } from '../app/services/deck';
 import { BehaviorSubject, map, Observable } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { GanopolyCardComponent } from '../ganopoly-card/ganopoly-card';
-import { Card, CardType } from '../models/card';
+import { ActionSet, Card, CardType } from '../models/card';
 import { Player } from '../models/player';
 import { HeaderComponent } from '../header/header';
 import { RouterModule } from '@angular/router';
@@ -96,10 +96,10 @@ export class GameComponent {
     ).subscribe(shuffleCards => {
       // Distribute cards
       const players: Player[] = [
-        { id: 1, hand: shuffleCards.slice(0, 5), name: "Alice", properties: [], money: [], actions: [] },
-        { id: 2, hand: shuffleCards.slice(5, 10), name: "Tom", properties: [], money: [], actions: [] },
-        { id: 3, hand: shuffleCards.slice(10, 15), name: "John", properties: [], money: [], actions: [] },
-        { id: 4, hand: shuffleCards.slice(15, 22), name: "Human", properties: [], money: [], actions: [] } // + 2Cards
+        { id: 1, hand: shuffleCards.slice(0, 5), name: "Alice", properties: [], money: [], actions: [], doubleRent: false  },
+        { id: 2, hand: shuffleCards.slice(5, 10), name: "Tom", properties: [], money: [], actions: [], doubleRent: false  },
+        { id: 3, hand: shuffleCards.slice(10, 15), name: "John", properties: [], money: [], actions: [], doubleRent: false  },
+        { id: 4, hand: shuffleCards.slice(15, 22), name: "Human", properties: [], money: [], actions: [], doubleRent: false  } // + 2Cards
       ];
 
 
@@ -323,6 +323,90 @@ export class GameComponent {
 
   //   this.players$.next(players); // update observable pour UI
   // }
+
+
+  applyAction(card: Card, currentPlayer: Player, players: Player[]) {
+  if (!card.playAction || !card.actionTargetId) return;
+
+  // 1️⃣ Trouver le joueur ciblé
+  const target = players.find(p => p.id === card.actionTargetId);
+  if (!target) return;
+
+  switch (card.setAction) {
+
+    case ActionSet.DealBanco:
+      // Exemple : voler une somme d'argent (ici on prend la 1ère carte Money)
+      if (target.money.length > 0) {
+        const stolen = target.money.shift()!;
+        currentPlayer.money.push(stolen);
+      }
+      break;
+
+    case ActionSet.DealSwap:
+      // Exemple : échanger une propriété entre joueur et cible
+      if (currentPlayer.properties.length > 0 && target.properties.length > 0) {
+        const temp = currentPlayer.properties.pop()!;
+        currentPlayer.properties.push(target.properties.pop()!);
+        target.properties.push(temp);
+      }
+      break;
+
+    case ActionSet.DealDuel:
+      // Exemple : duel, le gagnant prend une carte aléatoire
+      if (target.hand.length > 0) {
+        const cardTaken = target.hand.splice(Math.floor(Math.random() * target.hand.length), 1)[0];
+        currentPlayer.hand.push(cardTaken);
+      }
+      break;
+
+    case ActionSet.Joker:
+      // Exemple : Joker permet de changer la couleur d'une propriété
+      // Ici tu pourrais demander à l'utilisateur quel setType il veut
+      break;
+
+    case ActionSet.DealJackpot:
+      // Exemple : prendre 3 cartes Money de la pile générale
+      const remainingDeck = this. remainingDeck$.getValue();
+      for (let i = 0; i < 3 && remainingDeck.length > 0; i++) {
+        currentPlayer.money.push(remainingDeck.shift()!);
+      }
+      this.remainingDeck$.next(remainingDeck);
+      break;
+
+    case ActionSet.Birthday:
+      // Chaque autre joueur donne 1 Money
+      players
+        .filter(p => p.id !== currentPlayer.id)
+        .forEach(p => {
+          if (p.money.length > 0) {
+            currentPlayer.money.push(p.money.shift()!);
+          }
+        });
+      break;
+
+    case ActionSet.DoubleRent:
+      // Ici tu pourrais appliquer un bonus pour le prochain Rent joué
+      currentPlayer.doubleRent = true;
+      break;
+
+    case ActionSet.House:
+    case ActionSet.Hotel:
+      // Exemple : ajouter House/Hotel sur propriété de couleur complète
+      const colorProps = currentPlayer.properties.filter(pr => pr.setType === card.setType);
+      if (colorProps.length === 3) {
+        currentPlayer.properties.push(card); // stocke la carte House/Hotel
+      }
+      break;
+
+    case ActionSet.PassGo:
+      this.takeCards(2, currentPlayer.name); 
+      break;
+
+    default:
+      console.warn('Action non implémentée', card.setAction);
+  }
+}
+
 
 
 }
