@@ -88,15 +88,15 @@
     <div class="btn-group" role="group" aria-label="Card selection">
         <!-- Not Picked -->
         <input type="radio" class="btn-check" name="card-{{card.id}}" id="not-picked-{{card.id}}" [checked]="!selected" (change)="onCardStateChange('not-picked')">
-        <label class="btn btn-outline-secondary" for="not-picked-{{card.id}}">Skip</label>
+        <label class="btn btn-outline-dark" for="not-picked-{{card.id}}">Skip</label>
 
         <!-- Money -->
         <input type="radio" class="btn-check" name="card-{{card.id}}" id="money-{{card.id}}" [checked]="selected && !card.playAction" (change)="onCardStateChange('money')">
-        <label class="btn btn-outline-success" for="money-{{card.id}}">Money</label>
+        <label class="btn btn-outline-danger" for="money-{{card.id}}"><i class="bi bi-currency-euro me-2"></i>Money</label>
 
         <!-- Action -->
         <input type="radio" class="btn-check" name="card-{{card.id}}" id="action-{{card.id}}" [checked]="selected && card.playAction" (change)="onCardStateChange('action')">
-        <label class="btn btn-outline-primary" for="action-{{card.id}}">Action</label>
+        <label class="btn btn-outline-danger" for="action-{{card.id}}">Action</label>
     </div>
 
     } } @else {
@@ -105,14 +105,14 @@
 
         <!-- Skip -->
         <input type="radio" class="btn-check" name="pickState-{{card?.id}}" id="skip-{{card?.id}}" [checked]="!selected" (change)="onPickStateChange(false)">
-        <label class="btn btn-outline-secondary" for="skip-{{card?.id}}">
+        <label class="btn btn-outline-dark" for="skip-{{card?.id}}">
     Skip
   </label>
 
         <!-- Take -->
         <input type="radio" class="btn-check" name="pickState-{{card?.id}}" id="take-{{card?.id}}" [checked]="selected" (change)="onPickStateChange(true)">
-        <label class="btn btn-outline-success" for="take-{{card?.id}}">
-    <i class="bi bi-hand-index-fill"></i>  Take
+        <label class="btn btn-outline-danger" for="take-{{card?.id}}">
+    <i class="bi bi-hand-index-fill me-2"></i>  Take
   </label>
 
     </div>
