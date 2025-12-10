@@ -35,9 +35,7 @@
             <div class="player-infos">
                 @if (selectedCards.length > 3) {
                 <p class="text-danger ">Max 3 cards selected</p>
-                } @if (selectedCards.length === 0) {
-                <p class="text-danger ">No Card selected</p>
-                } @if((currentPlayerIndex | async) === 3) {<button [disabled]="selectedCards.length===0 ||selectedCards.length> 3" class="btn btn-success" (click)="endturn()">END TURN</button> }
+                } @if((currentPlayerIndex | async) === 3) {<button [disabled]="selectedCards.length> 3" class="btn btn-success" (click)="endturn()">END TURN</button> }
             </div>
 
         </div>
