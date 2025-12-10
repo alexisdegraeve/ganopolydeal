@@ -11,12 +11,13 @@ import { CommonModule } from '@angular/common';
 export class GanopolyCardComponent {
   @Input() card?: Card;
   @Output() selectionChange = new EventEmitter<{card: Card, selected: boolean}>();
-  showFront = true;
+  @Input() showFront = true;
   selected = false;
   CardType = CardType;
   PropertySet = PropertySet;
   ActionSet = ActionSet;
   @Input() readOnly = true;
+  @Input() clickable = true;
 
   toggleCard() {
     this.showFront = !this.showFront;

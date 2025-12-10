@@ -5,7 +5,7 @@
     <!-- <button class="btn btn-primary" (click)="remove()">REMOVE</button> -->
 </div>
 } @if (startGame) {
-<div class="options">
+<div class="options  mb-4">
     <button class="btn btn-danger" (click)="stopGame()">Stop Game</button>
     <!-- <button class="btn btn-primary" (click)="remove()">REMOVE</button> -->
 </div>
@@ -15,7 +15,13 @@
 
 
     <div class="player ">
-        <div class="player-name "><span class="name">{{ player.name}}</span> You can find money, properties, and action cards.</div>
+        <div class="player-name "><span class="name">
+         @if(player.name.toLowerCase() !== 'human') {
+                <i class="bi bi-robot me-2"></i>
+                }@else {
+                <i class="bi bi-house-door-fill me-2"></i>
+        }
+      {{ player.name}}</span> You can find money, properties, and action cards.</div>
 
         @if(player.name.toLowerCase() === 'human') {
         <div class="player-cards ">
@@ -34,6 +40,12 @@
                 } @if((currentPlayerIndex | async) === 3) {<button [disabled]="selectedCards.length===0 ||selectedCards.length> 3" class="btn btn-success" (click)="endturn()">END TURN</button> }
             </div>
 
+        </div>
+        } @else {
+
+        <div class="player-cards ">
+            <span>Total: x{{ player.hand.length }}</span>
+            <ganopoly-card [clickable]="false" [showFront]="false" [readOnly]="true"></ganopoly-card>
         </div>
         }
 
