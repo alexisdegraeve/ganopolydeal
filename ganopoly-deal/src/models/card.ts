@@ -96,5 +96,6 @@ export interface Card {
   valueCount?: number;
   rent?: number;
   playAction?: boolean;
+  actionTargetId?: number;
 }
 

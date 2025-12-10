@@ -99,7 +99,25 @@
         <label class="btn btn-outline-danger" for="action-{{card.id}}">Action</label>
     </div>
 
-    } } @else {
+    <!-- Montrer les joueurs UNIQUEMENT si la carte est sélectionnée en tant qu’action -->
+    @if (selected && card?.playAction) {
+
+    <div class="mt-3">
+        <label class="fw-bold">Choose target player:</label>
+
+        <div class="btn-group-vertical w-100 mt-2">
+
+            @for(p of players; track p.id) { @if (p.name.toLowerCase() !== 'human') {
+            <input type="radio" class="btn-check" name="target-{{card!.id}}" id="target-{{card!.id}}-{{p.id}}" [checked]="card?.actionTargetId === p.id" (change)="onTargetSelected(p.id)" />
+
+            <label class="btn btn-outline-primary" for="target-{{card!.id}}-{{p.id}}">
+                        {{ p.name }}
+                    </label> } }
+
+        </div>
+    </div>
+
+    } } } @else {
 
     <div class="btn-group" role="group" aria-label="Take or Skip">
 

@@ -27,7 +27,7 @@
         <div class="player-cards ">
             @for(card of player.hand; track $index) {
 
-            <ganopoly-card [readOnly]="false" [card]="card " (selectionChange)="onCardSelectionChange($event) "></ganopoly-card>
+            <ganopoly-card [readOnly]="false" [players]="players" [card]="card " (selectionChange)="onCardSelectionChange($event) "></ganopoly-card>
 
 
             }
