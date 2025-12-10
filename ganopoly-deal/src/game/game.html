@@ -81,6 +81,20 @@
 
     </div>
     }
+
+    <div class="player">
+        <div class="player-name"><span class="name">Actions</span></div> @if(lastActionCard$ | async; as lastActionCard) {
+        <ganopoly-card [card]="lastActionCard"></ganopoly-card>
+        }
+        <!-- @if(totalCardsHuman$ | async; as total) {
+        <div>
+            <button class="btn btn-primary" (click)="takeCards(2, 'human')">Take 2 Cards </button>
+        </div>
+        } @else {
+        <button class="btn btn-primary" (click)="takeCards(5, 'human')">Take 5 Cards </button> } -->
+
+    </div>
+
     <div class="debug">
         Remaining DECK @if (remainingDeck$ | async; as remainingDeck) { @for(card of remainingDeck; track $index) {
         <ganopoly-card [card]="card"></ganopoly-card>

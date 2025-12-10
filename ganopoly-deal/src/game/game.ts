@@ -20,10 +20,12 @@ export class GameComponent {
   players$ = new BehaviorSubject<Player[]>([]);
   remainingDeck$ = new BehaviorSubject<Card[]>([]);
   lastCard$ = new BehaviorSubject<Card | null>(null);
+  actionDeck$= new BehaviorSubject<Card[]>([]);
   totalCardsHuman$ = new BehaviorSubject<number>(0);
   selectedCards: Card[] = [];
   currentPlayerIndex = new BehaviorSubject<number>(0);
   startGame = false;
+  lastActionCard$ = this.actionDeck$.pipe(map(deck => deck.at(-1) || null));
 
 
   // Fisher-Yates algorithm
@@ -251,7 +253,14 @@ export class GameComponent {
           // You can either:
           // - place into a global discard pile
           // - or store actions played by human
-          human.actions.push(card);
+          if(card.playAction) {
+            // store
+            const actionDeck = this.actionDeck$.getValue();
+            actionDeck.push(card);
+            this.actionDeck$.next(actionDeck);
+          } else {
+            human.money.push(card);
+          }
           break;
       }
     }
