@@ -46,7 +46,6 @@ export enum CardType {
   Property = 'property',
   PropertyJoker = 'property_joker',
   Action = 'action',
-  Rent = 'rent',
   Money = 'money',
   Rule = 'rule'
 }
@@ -81,6 +80,7 @@ export enum ActionSet {
   DealBanco ='DealBanco',
   DealDuel = 'DealDuel',
   DealSwap = 'DealSwap',
+  Rent = 'Rent'
 
 }
 

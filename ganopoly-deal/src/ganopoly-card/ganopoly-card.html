@@ -13,7 +13,7 @@
                   'money-ten': card?.value === 10,
                 }">
                     </div>
-                    } @if(card?.type === CardType.Rent) {
+                    } @if ((card?.type === CardType.Action) && (card?.setAction === ActionSet.Rent)) {
                     <div [ngClass]="{
                   'prop-rent-blue-brown': card?.setType === PropertySet.LightBlue &&  card?.setType2 === PropertySet.Brown,
                   'prop-rent-pink-orange': card?.setType === PropertySet.Pink &&  card?.setType2 === PropertySet.Orange,
@@ -84,7 +84,7 @@
 
         </div>
     </div>
-    @if(!readOnly) { @if(card?.type === CardType.Action || card?.type === CardType.Rent ) { @if(card) {
+    @if(!readOnly) { @if(card?.type === CardType.Action || card?.setAction === ActionSet.Rent ) { @if(card) {
     <div class="btn-group mt-2" role="group" aria-label="Card selection">
         <!-- Not Picked -->
         <input type="radio" class="btn-check" name="card-{{card.id}}" id="not-picked-{{card.id}}" [checked]="!selected" (change)="onCardStateChange('not-picked')">
@@ -117,7 +117,7 @@
         </div>
     </div>
 
-    } @if (selected && card.playAction && card.type === 'rent') {
+    } @if (selected && card.playAction && card.setAction === ActionSet.Rent) {
 
     <div class="mt-3">
         <label class="fw-bold">Choose rent color:</label>

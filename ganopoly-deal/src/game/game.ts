@@ -255,9 +255,10 @@ export class GameComponent {
           // - or store actions played by human
           if(card.playAction) {
             // store
-            const actionDeck = this.actionDeck$.getValue();
-            actionDeck.push(card);
-            this.actionDeck$.next(actionDeck);
+            // const actionDeck = this.actionDeck$.getValue();
+            // actionDeck.push(card);
+            // this.actionDeck$.next(actionDeck);
+               this.applyAction(card, human, players);
           } else {
             human.money.push(card);
           }
@@ -384,6 +385,39 @@ export class GameComponent {
         });
       break;
 
+
+    case ActionSet.Rent:
+      if (!card.rentColor) {
+        console.warn('Rent color not selected');
+        break;
+      }
+
+      // On filtre les propriétés du joueur ciblé correspondant à la couleur demandée
+      const targetProps = target.properties.filter(p => p.setType === card.rentColor);
+
+      if (targetProps.length === 0) {
+        console.log(`Target player ${target.name} has no property of color ${card.rentColor}. Rent lost.`);
+        // La carte va quand même dans la pile d'actions
+      } else {
+        // Exemple simple : on prend de l'argent équivalent à 1 carte Money par propriété de cette couleur
+        const amountDue = targetProps.length;
+        for (let i = 0; i < amountDue; i++) {
+          if (target.money.length > 0) {
+            const payment = target.money.shift()!;
+            currentPlayer.money.push(payment);
+          } else {
+            console.log(`${target.name} n'a plus d'argent à donner`);
+          }
+        }
+      }
+
+      // Stocker la carte dans la pile d'actions
+      const actionDeck = this.actionDeck$.getValue();
+      actionDeck.push(card);
+      this.actionDeck$.next(actionDeck);
+
+      break;
+
     case ActionSet.DoubleRent:
       // Ici tu pourrais appliquer un bonus pour le prochain Rent joué
       currentPlayer.doubleRent = true;
@@ -399,7 +433,7 @@ export class GameComponent {
       break;
 
     case ActionSet.PassGo:
-      this.takeCards(2, currentPlayer.name); 
+      this.takeCards(2, currentPlayer.name);
       break;
 
     default:
