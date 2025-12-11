@@ -64,4 +64,16 @@ export class GanopolyCardComponent {
     });
   }
 
+  onRentColorSelected(color: PropertySet) {
+    if (!this.card) return;
+    this.card.rentColor = color;
+    this.selectionChange.emit({ card: this.card, selected: true });
+  }
+
+  getRentColors(card: Card): PropertySet[] {
+    const colors: PropertySet[] = [];
+    if (card.setType) colors.push(card.setType);
+    if (card.setType2) colors.push(card.setType2);
+    return colors;
+  }
 }

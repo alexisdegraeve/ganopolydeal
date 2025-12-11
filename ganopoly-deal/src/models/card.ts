@@ -97,5 +97,6 @@ export interface Card {
   rent?: number;
   playAction?: boolean;
   actionTargetId?: number;
+  rentColor?: PropertySet;
 }
 
