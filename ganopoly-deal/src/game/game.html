@@ -23,7 +23,12 @@
         }
       {{ player.name}}</span> You can find money, properties, and action cards.</div>
 
-        @if(player.name.toLowerCase() === 'human') {
+        @if(player.name.toLowerCase() === 'human') { @if(alertMessage) { }
+
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            {{ alertMessage }}
+            <button type="button" class="btn-close" aria-label="Close" (click)="alertMessage = null"></button>
+        </div>
         <div class="player-cards ">
             @for(card of player.hand; track $index) {
 

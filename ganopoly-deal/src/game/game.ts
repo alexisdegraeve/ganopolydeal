@@ -26,7 +26,14 @@ export class GameComponent {
   currentPlayerIndex = new BehaviorSubject<number>(0);
   startGame = false;
   lastActionCard$ = this.actionDeck$.pipe(map(deck => deck.at(-1) || null));
+  alertMessage: string | null = null;
 
+
+
+  showAlert(message: string, duration = 3000) {
+    this.alertMessage = message;
+    setTimeout(() => this.alertMessage = null, duration);
+  }
 
   // Fisher-Yates algorithm
   shuffle<T>(array: T[]): T[] {
@@ -59,7 +66,7 @@ export class GameComponent {
     // Find player by name
     const player = players.find(p => p.name.toLowerCase() === playerName.toLowerCase());
     if (!player) {
-      console.warn(`Player "${playerName}" not found`);
+      this.showAlert(`Player "${playerName}" not found`);
       return;
     }
 
@@ -388,7 +395,7 @@ export class GameComponent {
 
     case ActionSet.Rent:
       if (!card.rentColor) {
-        console.warn('Rent color not selected');
+        this.showAlert('Rent color not selected');
         break;
       }
 
@@ -396,7 +403,7 @@ export class GameComponent {
       const targetProps = target.properties.filter(p => p.setType === card.rentColor);
 
       if (targetProps.length === 0) {
-        console.log(`Target player ${target.name} has no property of color ${card.rentColor}. Rent lost.`);
+        this.showAlert(`Target player ${target.name} has no property of color ${card.rentColor}. Rent lost.`);
         // La carte va quand même dans la pile d'actions
       } else {
         // Exemple simple : on prend de l'argent équivalent à 1 carte Money par propriété de cette couleur
@@ -406,7 +413,8 @@ export class GameComponent {
             const payment = target.money.shift()!;
             currentPlayer.money.push(payment);
           } else {
-            console.log(`${target.name} n'a plus d'argent à donner`);
+            this.showAlert(`${target.name} n'a plus d'argent à donner !`);
+            // console.log(`${target.name} n'a plus d'argent à donner`);
           }
         }
       }
