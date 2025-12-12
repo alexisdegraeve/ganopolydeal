@@ -98,5 +98,6 @@ export interface Card {
   playAction?: boolean;
   actionTargetId?: number;
   rentColor?: PropertySet;
+  targetSeries?: PropertySet;
 }
 

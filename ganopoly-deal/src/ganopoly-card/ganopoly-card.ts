@@ -76,4 +76,49 @@ export class GanopolyCardComponent {
     if (card.setType2) colors.push(card.setType2);
     return colors;
   }
+
+getEligibleSeries(card: Card): { color: PropertySet, cards: Card[] }[] {
+  const human = this.players.find(p => p.name.toLowerCase() === 'human');
+  if (!human) return [];
+
+  if (!card || (card.setAction !== ActionSet.House && card.setAction !== ActionSet.Hotel)) {
+    return [];
+  }
+
+  // Groupe par couleur
+  const sets: Record<PropertySet, Card[]> = {} as any;
+
+  for (const prop of human.properties) {
+    if (prop.setType) {
+      const color = prop.setType as PropertySet;
+      if (!sets[color]) sets[color] = [];
+      sets[color].push(prop);
+    }
+  }
+
+  // Règles Monopoly Deal :
+  const requiredByColor: Record<PropertySet, number> = {
+    [PropertySet.Brown]: 2,
+    [PropertySet.DarkBlue]: 2,
+
+    // les autres couleurs non définies ici seront à 3
+  } as any;
+
+  // Filtrer les couleurs jouables (série complète)
+  return Object.entries(sets)
+    .filter(([colorKey, cards]) => {
+      const color = colorKey as PropertySet;
+      const needed = requiredByColor[color] ?? 3;
+
+      const realProps = cards.filter(c => c.type === CardType.Property);
+
+      return realProps.length >= needed;
+    })
+    .map(([colorKey, cards]) => ({
+      color: colorKey as PropertySet,
+      cards
+    }));
+}
+
+
 }

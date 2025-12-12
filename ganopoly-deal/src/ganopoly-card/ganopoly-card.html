@@ -117,6 +117,27 @@
         </div>
     </div>
 
+    }@if (selected && card.playAction && (card.setAction === ActionSet.House || card.setAction === ActionSet.Hotel)) {
+
+    <div class="mt-3">
+        <label class="fw-bold">Choose a property set:</label> @if(getEligibleSeries(card).length === 0) {
+        <div class="alert alert-warning mt-2">
+            No complete property set available for placing a House/Hotel.
+        </div>
+        } @else {
+        <div class="btn-group-vertical w-100 mt-2">
+
+            @for(series of getEligibleSeries(card); track series.color) {
+
+            <input type="radio" class="btn-check" name="series-{{ card.id }}" id="series-{{ card.id }}-{{ series.color }}" [checked]="card.targetSeries === series.color" (change)="card.targetSeries = series.color">
+
+            <label class="btn btn-outline-success" for="series-{{ card.id }}-{{ series.color }}">
+          {{ series.color }} ({{ series.cards.length }} cards)
+        </label> }
+        </div>
+        }
+    </div>
+
     } @if (selected && card.playAction && card.setAction === ActionSet.Rent) {
 
     <div class="mt-3">
