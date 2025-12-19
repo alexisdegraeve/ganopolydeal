@@ -151,6 +151,10 @@ getEligibleSeries(card: Card): { color: PropertySet, cards: Card[] }[] {
       );
     }
 
+    if (this.card.setAction === ActionSet.DealSwap) {
+      return human.properties.length > 0;
+    }
+
     // Autres actions jouables par défaut
     return true;
   }
