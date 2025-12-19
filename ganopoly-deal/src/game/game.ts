@@ -3,7 +3,7 @@ import { DeckService } from '../app/services/deck';
 import { BehaviorSubject, map, Observable } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { GanopolyCardComponent } from '../ganopoly-card/ganopoly-card';
-import { ActionSet, Card, CardType } from '../models/card';
+import { ActionSet, Card, CardType, PropertySet } from '../models/card';
 import { Player } from '../models/player';
 import { HeaderComponent } from '../header/header';
 import { RouterModule } from '@angular/router';
@@ -395,8 +395,12 @@ export class GameComponent {
 
       case ActionSet.Rent:
         if (!card.rentColor) {
-          this.showAlert('Rent color not selected');
-          break;
+          const defaultColor = this.getDefaultRentColor(currentPlayer, card) ?? undefined;
+          card.rentColor = defaultColor;
+          if (!card.rentColor) {
+            this.showAlert('Rent color not selected');
+            break;
+          }
         }
 
         // On filtre les propriétés du joueur ciblé correspondant à la couleur demandée
@@ -458,6 +462,55 @@ export class GameComponent {
         console.warn('Action non implémentée', card.setAction);
     }
   }
+
+  canPlayActionCard(player: Player, card: Card): boolean {
+    if (!player) return false;
+
+    // Carte Rent
+    if (card.setAction === ActionSet.Rent) {
+      const rentColors: PropertySet[] = card.sets || [];
+      const hasProperty = rentColors.some(color =>
+        player.properties.some(p => p.setType === color || p.setType2 === color)
+      );
+      return hasProperty;
+    }
+
+    // Carte PassGo : désactiver si main pleine
+    if (card.setAction === ActionSet.PassGo) {
+      return player.hand.length < 5;
+    }
+
+    // Autres cartes Action jouables par défaut
+    return true;
+  }
+
+
+  getDefaultRentColor(player: Player, card: Card): PropertySet | null {
+    if (card.setAction !== ActionSet.Rent) return null;
+
+    const rentColors: PropertySet[] = card.sets || [];
+    const availableColors = rentColors.filter(color =>
+      player.properties.some(p => p.setType === color || p.setType2 === color)
+    );
+
+    return availableColors.length === 1 ? availableColors[0] : null;
+  }
+
+    isEndTurnDisabled(human: Player): boolean {
+      // const players = this.players$.getValue();
+      // const human = players.find(p => p.name.toLowerCase() === 'human');
+      // console.log('isEndTurnDisabled ', human);
+      if (!human) return true;
+
+      // 1️⃣ Limite de cartes sélectionnées
+      if (this.selectedCards.length > 3) return true;
+
+      // 2️⃣ Limite de main après avoir joué
+      if ((human.hand.length - this.selectedCards.length) > 7) return true;
+
+      return false;
+  }
+
 
 
 }

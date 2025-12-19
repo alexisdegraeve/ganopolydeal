@@ -21,6 +21,7 @@ export class GanopolyCardComponent {
   @Input() readOnly = true;
   @Input() clickable = true;
   @Input() players: Player[] = [];
+  @Input() selectedCards: Card[] = [];
 
   toggleCard() {
     this.showFront = !this.showFront;
@@ -119,6 +120,32 @@ getEligibleSeries(card: Card): { color: PropertySet, cards: Card[] }[] {
       cards
     }));
 }
+
+  canPlayAction(): boolean {
+    if (!this.players || !this.card) return false;
+    const human = this.players.find(p => p.name.toLowerCase() === 'human');
+    if (!human) return true;
+    if (!human || !this.card) return false;
+
+      const selectedCount = this.selectedCards ? this.selectedCards.length : 0;
+
+    // PassGo : limite main
+    if (this.card.setAction === ActionSet.PassGo) {
+      const projectedHand = human.hand.length - selectedCount;
+      return projectedHand <= 7;
+    }
+
+    // Rent : vérifier si le joueur a au moins une propriété correspondante
+    if (this.card.setAction === ActionSet.Rent) {
+      const rentColors: PropertySet[] = this.card.sets || [];
+      return rentColors.some(color =>
+        human.properties.some(p => p.setType === color || p.setType2 === color)
+      );
+    }
+
+    // Autres actions jouables par défaut
+    return true;
+  }
 
 
 }

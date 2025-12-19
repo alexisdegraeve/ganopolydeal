@@ -95,8 +95,8 @@
         <label class="btn btn-outline-danger" for="money-{{card.id}}"><i class="bi bi-currency-euro me-2"></i>Money</label>
 
         <!-- Action -->
-        <input type="radio" class="btn-check" name="card-{{card.id}}" id="action-{{card.id}}" [checked]="selected && card.playAction" (change)="onCardStateChange('action')">
-        <label class="btn btn-outline-danger" for="action-{{card.id}}">Action</label>
+        <input type="radio" class="btn-check" name="card-{{card.id}}" id="action-{{card.id}}" [checked]="selected && card.playAction" (change)="onCardStateChange('action')" [disabled]="!canPlayAction()">
+        <label class="btn btn-outline-danger" for="action-{{card.id}}" [attr.title]="card.setAction === ActionSet.Rent && !canPlayAction() ? 'No matching properties to collect rent' : ''">Action</label>
     </div>
 
     <!-- Montrer les joueurs UNIQUEMENT si la carte est sélectionnée en tant qu’action -->
