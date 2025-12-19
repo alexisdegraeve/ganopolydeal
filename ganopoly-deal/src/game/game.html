@@ -38,9 +38,12 @@
             }
 
             <div class="player-infos">
-                @if (selectedCards.length > 3) {
-                <p class="text-danger ">Max 3 cards selected</p>
-                } @if((currentPlayerIndex | async) === 3) {<button [disabled]="selectedCards.length> 3" class="btn btn-success" (click)="endturn()">END TURN</button> }
+
+                @if (player.hand.length - selectedCards.length > 7) {
+                <div class="alert alert-warning" role="alert">You must play cards until you have at most 7 cards in hand.</div>
+                } @if (selectedCards.length > 3) {
+                <div class="alert alert-warning" role="alert">You can select a maximum of 3 cards.</div>
+                } @if((currentPlayerIndex | async) === 3) {<button [disabled]="selectedCards.length> 3 || ((player.hand.length - selectedCards.length)  > 7 )" class="btn btn-success" (click)="endturn()">END TURN</button> }
             </div>
 
         </div>
@@ -83,9 +86,9 @@
     }
 
     <div class="player">
-        <div class="player-name"><span class="name">Action Pile</span></div> @if(lastActionCard$ | async; as lastActionCard) {
+        <div class="player-name"><span class="name">Action Stack</span></div> @if(lastActionCard$ | async; as lastActionCard) {
         <ganopoly-card [card]="lastActionCard"></ganopoly-card>
-        }
+        } @else { <span>No actions played yet.</span> }
         <!-- @if(totalCardsHuman$ | async; as total) {
         <div>
             <button class="btn btn-primary" (click)="takeCards(2, 'human')">Take 2 Cards </button>
