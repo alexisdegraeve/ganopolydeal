@@ -3,7 +3,7 @@ import { DeckService } from '../app/services/deck';
 import { BehaviorSubject, map, Observable } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { GanopolyCardComponent } from '../ganopoly-card/ganopoly-card';
-import { ActionSet, Card, CardType, PropertySet } from '../models/card';
+import { ActionSet, ALL_PROPERTY_COLORS, Card, CardType, PropertySet } from '../models/card';
 import { Player } from '../models/player';
 import { HeaderComponent } from '../header/header';
 import { RouterModule } from '@angular/router';
@@ -145,6 +145,9 @@ export class GameComponent {
     // 1. Poser les propriétés pour compléter les sets
     this.playProperties(player);
 
+    // Property Joker
+    this.playPropertiesJoker(player);
+
     // 2. Poser des billets si main trop pleine
     this.playMoneyIfHandFull(player);
 
@@ -163,6 +166,14 @@ export class GameComponent {
     }
   }
 
+  private playPropertiesJoker(player:Player) {
+      const jokers = player.hand.filter(c => c.type === CardType.PropertyJoker);
+      jokers.forEach(card => {
+        card.setType = this.chooseJokerColorForAI(player, card);
+        this.moveCardToProperties(player, card);
+      });
+  }
+
   private playProperties(player: Player) {
     // Pour chaque carte propriété dans la main
     const propertiesInHand = player.hand.filter(c => c.type === 'property');
@@ -173,6 +184,25 @@ export class GameComponent {
       }
     });
   }
+
+    private chooseJokerColorForAI(player: Player, card: Card): PropertySet {
+    // Exemple : choisir la couleur qui complète un set déjà existant
+    const colorCounts: Partial<Record<PropertySet, number>> = {};
+    for (const prop of player.properties) {
+      if (prop.setType) {
+        colorCounts[prop.setType] = (colorCounts[prop.setType] || 0) + 1;
+      }
+    }
+
+    // Priorité à la couleur avec le plus de cartes
+    const sorted = Object.entries(colorCounts).sort((a, b) => b[1] - a[1]);
+    if (sorted.length) return sorted[0][0] as PropertySet;
+
+    // Sinon couleur aléatoire
+    const colors = ALL_PROPERTY_COLORS || [];
+    return colors[Math.floor(Math.random() * colors.length)];
+  }
+
 
   private canPlaceProperty(card: Card): boolean {
     // Vérifie si le set est vide ou si ça complète un set existant
@@ -253,6 +283,14 @@ export class GameComponent {
       switch (card.type) {
 
         case CardType.Property:
+          human.properties.push(card);
+          break;
+
+        case CardType.PropertyJoker:
+          if (!card.setType) {
+            this.showAlert('Please choose a color for the Joker before playing it');
+            continue; // ne pas poser la carte tant que couleur non choisie
+          }
           human.properties.push(card);
           break;
 

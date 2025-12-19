@@ -183,5 +183,17 @@
   </label>
 
     </div>
-    } }
+
+    @if(card && selected && card.type === CardType.PropertyJoker) {
+    <div class="mt-3">
+        <label class="fw-bold">Choose a color for the Joker:</label>
+        <div class="btn-group-vertical w-100 mt-2">
+            @for(color of getAvailableJokerColors(card); track $index) {
+            <input type="radio" class="btn-check" name="jokercolor-{{ card.id }}" id="jokercolor-{{ card.id }}-{{ color }}" [checked]="card.setType === color" (change)="onJokerColorSelected(color)" />
+            <label class="btn btn-outline-success" for="jokercolor-{{ card.id }}-{{ color }}">
+          {{ color }}
+        </label> }
+        </div>
+    </div>
+    } } }
 </div>

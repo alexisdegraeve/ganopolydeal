@@ -101,3 +101,8 @@ export interface Card {
   targetSeries?: PropertySet;
 }
 
+export const ALL_PROPERTY_COLORS = [
+  PropertySet.Brown, PropertySet.DarkBlue, PropertySet.LightBlue, PropertySet.Pink,
+  PropertySet.Orange, PropertySet.Red, PropertySet.Yellow, PropertySet.Green,
+  PropertySet.Railroad, PropertySet.UtilityElec, PropertySet.UtilityWater
+];
