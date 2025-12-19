@@ -22,7 +22,7 @@ export class GameComponent {
   lastCard$ = new BehaviorSubject<Card | null>(null);
   actionDeck$ = new BehaviorSubject<Card[]>([]);
   totalCardsHuman$ = new BehaviorSubject<number>(0);
-  selectedCards: Card[] = [];
+  selectedCards$ = new BehaviorSubject<Card[]>([]);
   currentPlayerIndex = new BehaviorSubject<number>(0);
   startGame = false;
   lastActionCard$ = this.actionDeck$.pipe(map(deck => deck.at(-1) || null));
@@ -221,15 +221,19 @@ export class GameComponent {
 
   onCardSelectionChange(event: { card: Card, selected: boolean }) {
     console.log('onCardSelectionChange', event)
+    const current = this.selectedCards$.getValue();
+    let updated: Card[];
     if (event.selected) {
-      if (!this.selectedCards.some(c => c.id === event.card.id)) {
-        this.selectedCards.push(event.card);
+        // Ajouter si pas déjà présent
+        updated = current.some(c => c.id === event.card.id)
+          ? current
+          : [...current, event.card];
+      } else {
+        // Retirer la carte
+        updated = current.filter(c => c.id !== event.card.id);
       }
-    } else {
-      this.selectedCards = this.selectedCards.filter(
-        c => c.id !== event.card.id
-      );
-    }
+
+      this.selectedCards$.next(updated);
   }
 
 
@@ -242,9 +246,9 @@ export class GameComponent {
     if (!human) return;
 
 
-    console.log('CHECK ', this.selectedCards);
+    console.log('CHECK ', this.selectedCards$.getValue());
     // 1️⃣ Move selected cards into the proper piles
-    for (const card of this.selectedCards) {
+    for (const card of this.selectedCards$.value) {
 
       switch (card.type) {
 
@@ -275,11 +279,12 @@ export class GameComponent {
 
     // 2️⃣ Remove selected cards from the human hand
     human.hand = human.hand.filter(
-      c => !this.selectedCards.some(s => s.id === c.id)
+      c => !this.selectedCards$.getValue().some(s => s.id === c.id)
     );
 
     // 3️⃣ Reset UI selections
-    this.selectedCards = [];
+     this.selectedCards$.next([]);
+    // this.selectedCards = [];
 
     // Regarde le total de carte
     if (human.hand.length === 0) {
@@ -311,6 +316,7 @@ export class GameComponent {
       this.goToNextPlayer(); // IA joue 100% automatiquement
     } else {
       this.takeCards(2, 'human');
+      this.selectedCards$.next([]);
       // this.startHumanTurn();
     }
   }
@@ -500,13 +506,14 @@ export class GameComponent {
       // const players = this.players$.getValue();
       // const human = players.find(p => p.name.toLowerCase() === 'human');
       // console.log('isEndTurnDisabled ', human);
+      let selectedCards = this.selectedCards$.getValue();
       if (!human) return true;
 
       // 1️⃣ Limite de cartes sélectionnées
-      if (this.selectedCards.length > 3) return true;
+      if (selectedCards.length > 3) return true;
 
       // 2️⃣ Limite de main après avoir joué
-      if ((human.hand.length - this.selectedCards.length) > 7) return true;
+      if ((human.hand.length - selectedCards.length) > 7) return true;
 
       return false;
   }

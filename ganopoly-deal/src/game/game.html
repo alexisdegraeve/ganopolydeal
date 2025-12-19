@@ -32,16 +32,16 @@
         <div class="player-cards ">
             @for(card of player.hand; track $index) {
 
-            <ganopoly-card [selectedCards]="selectedCards" [readOnly]="false" [players]="players" [card]="card " (selectionChange)="onCardSelectionChange($event) "></ganopoly-card>
+            <ganopoly-card [selectedCards$]="selectedCards$" [readOnly]="false" [players]="players" [card]="card " (selectionChange)="onCardSelectionChange($event) "></ganopoly-card>
 
 
             }
 
             <div class="player-infos">
 
-                @if (player.hand.length - selectedCards.length > 7) {
+                @if (player.hand.length - selectedCards$.getValue().length > 7) {
                 <div class="alert alert-warning" role="alert">You must play cards until you have at most 7 cards in hand.</div>
-                } @if (selectedCards.length > 3) {
+                } @if (selectedCards$.getValue().length > 3) {
                 <div class="alert alert-warning" role="alert">You can select a maximum of 3 cards.</div>
                 } @if((currentPlayerIndex | async) === 3) {<button [disabled]="isEndTurnDisabled(player)" class="btn btn-success" (click)="endturn()">END TURN</button> }
             </div>

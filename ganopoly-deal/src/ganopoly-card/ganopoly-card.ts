@@ -1,7 +1,8 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Card, CardType, PropertySet, ActionSet } from '../models/card';
 import { CommonModule } from '@angular/common';
 import { Player } from '../models/player';
+import { BehaviorSubject } from 'rxjs';
 
 @Component({
   selector: 'ganopoly-card',
@@ -9,7 +10,7 @@ import { Player } from '../models/player';
   templateUrl: './ganopoly-card.html',
   styleUrl: './ganopoly-card.scss',
 })
-export class GanopolyCardComponent {
+export class GanopolyCardComponent implements OnInit {
   @Input() card?: Card;
   @Output() selectionChange = new EventEmitter<{ card: Card, selected: boolean }>();
   @Output() actionCardChange = new EventEmitter<{ card: Card, playAction: boolean }>();
@@ -21,7 +22,14 @@ export class GanopolyCardComponent {
   @Input() readOnly = true;
   @Input() clickable = true;
   @Input() players: Player[] = [];
-  @Input() selectedCards: Card[] = [];
+  @Input() selectedCards$!: BehaviorSubject<Card[]>;
+
+  ngOnInit() {
+  if (!this.card || !this.selectedCards$) return;
+    this.selectedCards$.subscribe(cards => {
+      this.selected = cards.some(c => c.id === this.card!.id);
+    });
+  }
 
   toggleCard() {
     this.showFront = !this.showFront;
@@ -127,7 +135,7 @@ getEligibleSeries(card: Card): { color: PropertySet, cards: Card[] }[] {
     if (!human) return true;
     if (!human || !this.card) return false;
 
-      const selectedCount = this.selectedCards ? this.selectedCards.length : 0;
+    const selectedCount = this.selectedCards$.getValue().length;
 
     // PassGo : limite main
     if (this.card.setAction === ActionSet.PassGo) {
