@@ -138,6 +138,17 @@
         }
     </div>
 
+    }@if (selected && card.playAction && card.setAction === ActionSet.DealJackpot) {
+    <div class="mt-3">
+        <label class="fw-bold">Choose target player:</label>
+        <div class="btn-group-vertical w-100 mt-2">
+            @for(p of players; track p.id) { @if (p.name.toLowerCase() !== 'human') {
+            <input type="radio" class="btn-check" name="target-{{card!.id}}" id="target-{{card!.id}}-{{p.id}}" [checked]="card.actionTargetId === p.id" (change)="onTargetSelected(p.id)" />
+            <label class="btn btn-outline-primary" for="target-{{card!.id}}-{{p.id}}">
+          {{ p.name }}
+        </label> } }
+        </div>
+    </div>
     } @if (selected && card.playAction && card.setAction === ActionSet.Rent) {
 
     <div class="mt-3">

@@ -224,16 +224,16 @@ export class GameComponent {
     const current = this.selectedCards$.getValue();
     let updated: Card[];
     if (event.selected) {
-        // Ajouter si pas déjà présent
-        updated = current.some(c => c.id === event.card.id)
-          ? current
-          : [...current, event.card];
-      } else {
-        // Retirer la carte
-        updated = current.filter(c => c.id !== event.card.id);
-      }
+      // Ajouter si pas déjà présent
+      updated = current.some(c => c.id === event.card.id)
+        ? current
+        : [...current, event.card];
+    } else {
+      // Retirer la carte
+      updated = current.filter(c => c.id !== event.card.id);
+    }
 
-      this.selectedCards$.next(updated);
+    this.selectedCards$.next(updated);
   }
 
 
@@ -283,7 +283,7 @@ export class GameComponent {
     );
 
     // 3️⃣ Reset UI selections
-     this.selectedCards$.next([]);
+    this.selectedCards$.next([]);
     // this.selectedCards = [];
 
     // Regarde le total de carte
@@ -379,13 +379,40 @@ export class GameComponent {
         break;
 
       case ActionSet.DealJackpot:
-        // Exemple : prendre 3 cartes Money de la pile générale
-        const remainingDeck = this.remainingDeck$.getValue();
-        for (let i = 0; i < 3 && remainingDeck.length > 0; i++) {
-          currentPlayer.money.push(remainingDeck.shift()!);
+        // Déterminer le joueur cible
+        let jackpotTarget: Player | undefined;
+
+        // Si joueur humain, utiliser celui sélectionné
+        if (currentPlayer.name.toLowerCase() === 'human') {
+          jackpotTarget = players.find(p => p.id === card.actionTargetId);
+          if (!jackpotTarget) {
+            this.showAlert('Please select a target player for Deal Jackpot');
+            break;
+          }
+        } else {
+          // IA : choisir au hasard un autre joueur
+          const otherPlayers = players.filter(p => p.id !== currentPlayer.id);
+          jackpotTarget = otherPlayers[Math.floor(Math.random() * otherPlayers.length)];
         }
-        this.remainingDeck$.next(remainingDeck);
+
+        // Montant du jackpot
+        const jackpotValue = 5;
+        let remaining = jackpotValue;
+
+        // Payer en cartes Money
+        while (remaining > 0 && jackpotTarget.money.length > 0) {
+          const moneyCard = jackpotTarget.money.shift()!;
+          currentPlayer.money.push(moneyCard);
+          remaining -= moneyCard.value ?? 1;
+        }
+
+        if (remaining > 0) {
+          this.showAlert(`${jackpotTarget.name} cannot fully pay the Jackpot!`);
+          // Ici tu peux ajouter logique pour payer en propriétés si tu veux
+        }
+
         break;
+
 
       case ActionSet.Birthday:
         // Chaque autre joueur donne 1 Money
@@ -443,21 +470,21 @@ export class GameComponent {
 
 
 
-        case ActionSet.House:
-        case ActionSet.Hotel:
-          if (!card.targetSeries) {
-            this.showAlert('Please choose a property series before playing this card');
-            return;
-          }
+      case ActionSet.House:
+      case ActionSet.Hotel:
+        if (!card.targetSeries) {
+          this.showAlert('Please choose a property series before playing this card');
+          return;
+        }
 
-          // Trouver les propriétés du joueur dans la série choisie
-          const selectedProps = currentPlayer.properties.filter(
-            pr => pr.setType === card.targetSeries
-          );
+        // Trouver les propriétés du joueur dans la série choisie
+        const selectedProps = currentPlayer.properties.filter(
+          pr => pr.setType === card.targetSeries
+        );
 
-          // On ajoute simplement la carte House/Hotel dans cette série
-          currentPlayer.properties.push(card);
-          break;
+        // On ajoute simplement la carte House/Hotel dans cette série
+        currentPlayer.properties.push(card);
+        break;
 
 
       case ActionSet.PassGo:
@@ -502,20 +529,20 @@ export class GameComponent {
     return availableColors.length === 1 ? availableColors[0] : null;
   }
 
-    isEndTurnDisabled(human: Player): boolean {
-      // const players = this.players$.getValue();
-      // const human = players.find(p => p.name.toLowerCase() === 'human');
-      // console.log('isEndTurnDisabled ', human);
-      let selectedCards = this.selectedCards$.getValue();
-      if (!human) return true;
+  isEndTurnDisabled(human: Player): boolean {
+    // const players = this.players$.getValue();
+    // const human = players.find(p => p.name.toLowerCase() === 'human');
+    // console.log('isEndTurnDisabled ', human);
+    let selectedCards = this.selectedCards$.getValue();
+    if (!human) return true;
 
-      // 1️⃣ Limite de cartes sélectionnées
-      if (selectedCards.length > 3) return true;
+    // 1️⃣ Limite de cartes sélectionnées
+    if (selectedCards.length > 3) return true;
 
-      // 2️⃣ Limite de main après avoir joué
-      if ((human.hand.length - selectedCards.length) > 7) return true;
+    // 2️⃣ Limite de main après avoir joué
+    if ((human.hand.length - selectedCards.length) > 7) return true;
 
-      return false;
+    return false;
   }
 
 
