@@ -166,7 +166,7 @@ export class GameComponent {
       moneyCards.forEach(card => this.moveCardToMoney(player, card));
     }
 
-      // 2️⃣ Choix stratégique léger (30% du temps)
+    // 2️⃣ Choix stratégique léger (30% du temps)
     if (moneyCards.length > 0 && Math.random() < 0.3) {
       this.moveCardToMoney(player, moneyCards[0]);
     }
@@ -464,9 +464,7 @@ export class GameComponent {
         players
           .filter(p => p.id !== currentPlayer.id)
           .forEach(p => {
-            if (p.money.length > 0) {
-              currentPlayer.money.push(p.money.shift()!);
-            }
+            this.payBirthday(p, currentPlayer);
           });
         break;
 
@@ -546,6 +544,44 @@ export class GameComponent {
         console.warn('Action non implémentée', card.setAction);
     }
   }
+
+
+  private payBirthday(from: Player, to: Player) {
+    // Sécurité
+    if (!from.money || from.money.length === 0) {
+      this.showAlert(`${from.name} cannot pay for Birthday`);
+      return;
+    }
+
+    // 1️⃣ Carte de valeur exactement 2
+    const exactTwo = from.money.find(c => c.value === 2);
+    if (exactTwo) {
+      from.money = from.money.filter(c => c !== exactTwo);
+      to.money.push(exactTwo);
+      return;
+    }
+
+    // 2️⃣ Carte de valeur > 2
+    const greaterThanTwo = from.money.find(c => (c.value ?? 0) > 2);
+    if (greaterThanTwo) {
+      from.money = from.money.filter(c => c !== greaterThanTwo);
+      to.money.push(greaterThanTwo);
+      return;
+    }
+
+    // 3️⃣ Deux cartes de valeur 1
+    const ones = from.money.filter(c => c.value === 1);
+    if (ones.length >= 2) {
+      const paid = ones.slice(0, 2);
+      from.money = from.money.filter(c => !paid.includes(c));
+      to.money.push(...paid);
+      return;
+    }
+
+    // 4️⃣ Impossible de payer
+    this.showAlert(`${from.name} cannot fully pay for Birthday`);
+  }
+
 
   playActionDealDuel(target: Player | undefined, card: Card, currentPlayer: Player) {
     if (!target) return;

@@ -92,10 +92,17 @@ export class GanopolyCardComponent implements OnInit {
   }
 
   getRentColors(card: Card): PropertySet[] {
-    const colors: PropertySet[] = [];
-    if (card.setType) colors.push(card.setType);
-    if (card.setType2) colors.push(card.setType2);
-    return colors;
+    const human = this.getHuman();
+    if (!human) return [];
+
+    const possibleColors = [card.setType, card.setType2]
+      .filter(Boolean) as PropertySet[];
+
+    return possibleColors.filter(color =>
+      human.properties.some(p =>
+        p.setType === color || p.setType2 === color
+      )
+    );
   }
 
   getEligibleSeries(card: Card): { color: PropertySet, cards: Card[] }[] {
@@ -147,7 +154,25 @@ export class GanopolyCardComponent implements OnInit {
     if (!human) return true;
     if (!human || !this.card) return false;
 
+    const needsProperties = [
+      ActionSet.Rent,
+      ActionSet.DealSwap,
+      ActionSet.DealDuel,
+      ActionSet.House,
+      ActionSet.Hotel
+    ];
+
+    if (needsProperties.includes(this.card.setAction!) && !this.humanHasProperties()) {
+      return false;
+    }
+
+    if ((this.card.type === CardType.PropertyJoker) && !this.humanHasProperties()) {
+      return false;
+    }
+
+
     const selectedCount = this.selectedCards$.getValue().length;
+
 
     // PassGo : limite main
     if (this.card.setAction === ActionSet.PassGo) {
@@ -178,35 +203,29 @@ export class GanopolyCardComponent implements OnInit {
       return this.canPlayHouseOrHotel(this.card);
     }
 
+
+
     // Autres actions jouables par défaut
     return true;
   }
 
 
   getAvailableJokerColors(card: Card): PropertySet[] {
-    if (!card) return [];
+    const human = this.getHuman();
+      if (!human) return [];
 
-    const human = this.players.find(p => p.name.toLowerCase() === 'human');
-    if (!human) return [];
+      const ownedColors = new Set<PropertySet>();
 
-    const setsCount: Partial<Record<PropertySet, number>> = {};
-    for (const prop of human.properties) {
-      if (prop.setType) setsCount[prop.setType] = (setsCount[prop.setType] || 0) + 1;
-      if (prop.setType2) setsCount[prop.setType2] = (setsCount[prop.setType2] || 0) + 1;
-    }
+      for (const prop of human.properties) {
+        if (prop.setType) ownedColors.add(prop.setType);
+        if (prop.setType2) ownedColors.add(prop.setType2);
+      }
 
-    const maxNeeded: Partial<Record<PropertySet, number>> = {
-      [PropertySet.Brown]: 2,
-      [PropertySet.DarkBlue]: 2
-    };
+      const allowed = card.setType2
+        ? [card.setType!, card.setType2]
+        : Array.from(ownedColors);
 
-    // Si le Joker est limité à certaines couleurs
-    const candidateColors = card.setType2 ? [card.setType!, card.setType2] : Object.values(PropertySet);
-
-    return candidateColors.filter(color => {
-      const needed = maxNeeded[color] ?? 3;
-      return (setsCount[color] ?? 0) < needed;
-    });
+      return allowed.filter(color => ownedColors.has(color));
   }
 
 
@@ -306,6 +325,15 @@ export class GanopolyCardComponent implements OnInit {
     // On considère la carte comme jouée
     this.card.playAction = true;
     this.selectionChange.emit({ card: this.card, selected: true });
+  }
+
+  private getHuman(): Player | undefined {
+    return this.players.find(p => p.name.toLowerCase() === 'human');
+  }
+
+  private humanHasProperties(): boolean {
+    const human = this.getHuman();
+    return !!human && human.properties.length > 0;
   }
 
 }
