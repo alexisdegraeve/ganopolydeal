@@ -93,7 +93,7 @@ export interface Card {
   setType2?: PropertySet;
   setAction?: ActionSet;   // For jokers: second possible set
   sets?: PropertySet[];        // For multi-color jokers or rent cards
-  valueCount?: number;
+  setSize?: number;
   rent?: number;
   playAction?: boolean;
   actionTargetId?: number;
