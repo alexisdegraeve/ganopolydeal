@@ -166,12 +166,12 @@ export class GameComponent {
     }
   }
 
-  private playPropertiesJoker(player:Player) {
-      const jokers = player.hand.filter(c => c.type === CardType.PropertyJoker);
-      jokers.forEach(card => {
-        card.setType = this.chooseJokerColorForAI(player, card);
-        this.moveCardToProperties(player, card);
-      });
+  private playPropertiesJoker(player: Player) {
+    const jokers = player.hand.filter(c => c.type === CardType.PropertyJoker);
+    jokers.forEach(card => {
+      card.setType = this.chooseJokerColorForAI(player, card);
+      this.moveCardToProperties(player, card);
+    });
   }
 
   private playProperties(player: Player) {
@@ -185,7 +185,7 @@ export class GameComponent {
     });
   }
 
-    private chooseJokerColorForAI(player: Player, card: Card): PropertySet {
+  private chooseJokerColorForAI(player: Player, card: Card): PropertySet {
     // Exemple : choisir la couleur qui complète un set déjà existant
     const colorCounts: Partial<Record<PropertySet, number>> = {};
     for (const prop of player.properties) {
@@ -404,6 +404,7 @@ export class GameComponent {
         break;
 
       case ActionSet.DealDuel:
+        this.playActionDealDuel(target, card, currentPlayer);
         // Exemple : duel, le gagnant prend une carte aléatoire
         if (target.hand.length > 0) {
           const cardTaken = target.hand.splice(Math.floor(Math.random() * target.hand.length), 1)[0];
@@ -534,6 +535,40 @@ export class GameComponent {
     }
   }
 
+  playActionDealDuel(target: Player | undefined, card: Card, currentPlayer: Player) {
+    if (!target) return;
+
+    let propertyToTake: Card | undefined;
+
+    if (card.duelTargetPropId) {
+      // Humain a choisi
+      propertyToTake = target.properties.find(p => p.id === card.duelTargetPropId);
+    } else {
+      // IA : pick random eligible property
+      const eligible = this.getEligiblePropertiesForDuel(target);
+      if (eligible.length > 0) {
+        propertyToTake = eligible[Math.floor(Math.random() * eligible.length)];
+      }
+    }
+
+    if (!propertyToTake) {
+      this.showAlert(`${target.name} has no eligible property to steal`);
+      return;
+    }
+
+    // Retirer du joueur cible et ajouter à l'actuel
+    target.properties = target.properties.filter(p => p.id !== propertyToTake!.id);
+    currentPlayer.properties.push(propertyToTake);
+
+    // Ajouter la carte DealDuel à la pile d'actions
+    const actionDeck = this.actionDeck$.getValue();
+    actionDeck.push(card);
+    this.actionDeck$.next(actionDeck);
+
+    return;
+
+  }
+
   canPlayActionCard(player: Player, card: Card): boolean {
     if (!player) return false;
 
@@ -583,6 +618,34 @@ export class GameComponent {
     return false;
   }
 
+
+  getEligiblePropertiesForDuel(targetPlayer: Player): Card[] {
+    if (!targetPlayer) return [];
+
+    const sets: Record<PropertySet, Card[]> = {} as any;
+    for (const prop of targetPlayer.properties) {
+      if (!prop.setType) continue;
+      const color = prop.setType as PropertySet;
+      if (!sets[color]) sets[color] = [];
+      sets[color].push(prop);
+    }
+
+    const requiredByColor: Partial<Record<PropertySet, number>> = {
+      [PropertySet.Brown]: 2,
+      [PropertySet.DarkBlue]: 2
+    };
+
+    const eligible: Card[] = [];
+    for (const [colorKey, cards] of Object.entries(sets)) {
+      const color = colorKey as PropertySet;
+      const needed = requiredByColor[color] ?? 3;
+      if (cards.length < needed) {
+        eligible.push(...cards);
+      }
+    }
+
+    return eligible;
+  }
 
 
 }

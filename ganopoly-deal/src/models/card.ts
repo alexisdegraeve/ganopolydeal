@@ -99,6 +99,7 @@ export interface Card {
   actionTargetId?: number;
   rentColor?: PropertySet;
   targetSeries?: PropertySet;
+  duelTargetPropId?: number;
 }
 
 export const ALL_PROPERTY_COLORS = [

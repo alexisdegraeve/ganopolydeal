@@ -99,6 +99,19 @@
         <label class="btn btn-outline-danger" for="action-{{card.id}}" [attr.title]="card.setAction === ActionSet.Rent && !canPlayAction() ? 'No matching properties to collect rent' : ''">Action</label>
     </div>
 
+    @if (selected && card.playAction && card.setAction === ActionSet.DealDuel && card.actionTargetId) {
+    <div class="mt-3">
+        <label class="fw-bold">Choose property to steal:</label>
+        <div class="btn-group-vertical w-100 mt-2">
+            @for(prop of getDuelPropertiesForCard(card); track prop.id) {
+            <input type="radio" class="btn-check" name="duelprop-{{card.id}}" id="duelprop-{{card.id}}-{{prop.id}}" [checked]="card.duelTargetPropId === prop.id" (change)="onDuelPropertySelected(prop.id)">
+            <label class="btn btn-outline-success" for="duelprop-{{card.id}}-{{prop.id}}">
+          {{ prop.name }} ({{ prop.setType }})
+        </label> }
+        </div>
+    </div>
+    }
+
     <!-- Montrer les joueurs UNIQUEMENT si la carte est sélectionnée en tant qu’action -->
     @if (selected && card.playAction && card.setAction !== ActionSet.PassGo && card.setAction !== ActionSet.DealJackpot) {
 

@@ -163,8 +163,15 @@ export class GanopolyCardComponent implements OnInit {
       );
     }
 
+    // DealSwap
     if (this.card.setAction === ActionSet.DealSwap) {
       return human.properties.length > 0;
+    }
+
+    // DealDuel : vérifier si au moins un joueur cible a des propriétés éligibles
+    if (this.card.setAction === ActionSet.DealDuel) {
+      const targets = this.players.filter(p => p.name.toLowerCase() !== 'human');
+      return targets.some(p => this.getEligiblePropertiesForDuel(p).length > 0);
     }
 
     // Autres actions jouables par défaut
@@ -172,33 +179,83 @@ export class GanopolyCardComponent implements OnInit {
   }
 
 
-getAvailableJokerColors(card: Card): PropertySet[] {
-  if (!card) return [];
+  getAvailableJokerColors(card: Card): PropertySet[] {
+    if (!card) return [];
 
-  const human = this.players.find(p => p.name.toLowerCase() === 'human');
-  if (!human) return [];
+    const human = this.players.find(p => p.name.toLowerCase() === 'human');
+    if (!human) return [];
 
-  const setsCount: Partial<Record<PropertySet, number>> = {};
-  for (const prop of human.properties) {
-    if (prop.setType) setsCount[prop.setType] = (setsCount[prop.setType] || 0) + 1;
-    if (prop.setType2) setsCount[prop.setType2] = (setsCount[prop.setType2] || 0) + 1;
+    const setsCount: Partial<Record<PropertySet, number>> = {};
+    for (const prop of human.properties) {
+      if (prop.setType) setsCount[prop.setType] = (setsCount[prop.setType] || 0) + 1;
+      if (prop.setType2) setsCount[prop.setType2] = (setsCount[prop.setType2] || 0) + 1;
+    }
+
+    const maxNeeded: Partial<Record<PropertySet, number>> = {
+      [PropertySet.Brown]: 2,
+      [PropertySet.DarkBlue]: 2
+    };
+
+    // Si le Joker est limité à certaines couleurs
+    const candidateColors = card.setType2 ? [card.setType!, card.setType2] : Object.values(PropertySet);
+
+    return candidateColors.filter(color => {
+      const needed = maxNeeded[color] ?? 3;
+      return (setsCount[color] ?? 0) < needed;
+    });
   }
 
-  const maxNeeded: Partial<Record<PropertySet, number>> = {
-    [PropertySet.Brown]: 2,
-    [PropertySet.DarkBlue]: 2
-  };
 
-  // Si le Joker est limité à certaines couleurs
-  const candidateColors = card.setType2 ? [card.setType!, card.setType2] : Object.values(PropertySet);
+  onDuelPropertySelected(propId: number) {
+    if (!this.selectedCards$.getValue().length) return;
 
-  return candidateColors.filter(color => {
-    const needed = maxNeeded[color] ?? 3;
-    return (setsCount[color] ?? 0) < needed;
-  });
-}
+    const card = this.selectedCards$.getValue().find(c => c.setAction === ActionSet.DealDuel);
+    if (!card) return;
 
+    card.duelTargetPropId = propId;
+
+    // La carte DealDuel devient jouée dès qu'une cible est choisie
+    card.playAction = true;
+    this.selectionChange.emit({ card, selected: true });
 
 
+  }
+
+  getDuelPropertiesForCard(card: Card): Card[] {
+    if (!card.actionTargetId) return [];
+    const target = this.players.find(p => p.id === card.actionTargetId);
+    if (!target) return [];
+    return this.getEligiblePropertiesForDuel(target);
+  }
+
+  getEligiblePropertiesForDuel(targetPlayer?: Player | null): Card[] {
+    if (!targetPlayer) return [];
+
+    // Grouper par couleur
+    const sets: Record<PropertySet, Card[]> = {} as any;
+    for (const prop of targetPlayer.properties) {
+      if (!prop.setType) continue;
+      const color = prop.setType as PropertySet;
+      if (!sets[color]) sets[color] = [];
+      sets[color].push(prop);
+    }
+
+    // Règles Monopoly Deal : on ne peut pas voler une série complète
+    const requiredByColor: Partial<Record<PropertySet, number>> = {
+      [PropertySet.Brown]: 2,
+      [PropertySet.DarkBlue]: 2
+      // autres = 3 par défaut
+    };
+
+    const eligible: Card[] = [];
+    for (const [colorKey, cards] of Object.entries(sets)) {
+      const color = colorKey as PropertySet;
+      const needed = requiredByColor[color] ?? 3;
+      if (cards.length < needed) {
+        eligible.push(...cards); // toutes les cartes de cette couleur sont éligibles
+      }
+    }
+    return eligible;
+  }
 
 }
