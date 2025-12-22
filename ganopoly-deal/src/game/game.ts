@@ -159,10 +159,16 @@ export class GameComponent {
   }
 
   private playMoneyIfHandFull(player: Player) {
+    const moneyCards = player.hand.filter(c => c.type === CardType.Money);
     // Si main > 5 cartes, poser les billets pour se protéger
     if (player.hand.length > 5) {
       const moneyCards = player.hand.filter(c => c.type === 'money');
       moneyCards.forEach(card => this.moveCardToMoney(player, card));
+    }
+
+      // 2️⃣ Choix stratégique léger (30% du temps)
+    if (moneyCards.length > 0 && Math.random() < 0.3) {
+      this.moveCardToMoney(player, moneyCards[0]);
     }
   }
 
