@@ -113,7 +113,7 @@
     }
 
     <!-- Montrer les joueurs UNIQUEMENT si la carte est sélectionnée en tant qu’action -->
-    @if (selected && card.playAction && card.setAction !== ActionSet.PassGo && card.setAction !== ActionSet.DealJackpot) {
+    @if (selected && card.playAction && card.setAction !== ActionSet.PassGo && card.setAction !== ActionSet.DealJackpot && card.setAction !== ActionSet.Birthday) {
 
     <div class="mt-3">
         <label class="fw-bold">Choose target player:</label>
