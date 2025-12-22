@@ -100,6 +100,8 @@ export interface Card {
   rentColor?: PropertySet;
   targetSeries?: PropertySet;
   duelTargetPropId?: number;
+  hasHouse?: boolean;
+  hasHotel?: boolean;
 }
 
 export const ALL_PROPERTY_COLORS = [

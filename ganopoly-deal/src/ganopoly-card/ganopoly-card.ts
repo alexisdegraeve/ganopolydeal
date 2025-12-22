@@ -174,6 +174,10 @@ export class GanopolyCardComponent implements OnInit {
       return targets.some(p => this.getEligiblePropertiesForDuel(p).length > 0);
     }
 
+    if (this.card.setAction === ActionSet.House || this.card.setAction === ActionSet.Hotel) {
+      return this.canPlayHouseOrHotel(this.card);
+    }
+
     // Autres actions jouables par défaut
     return true;
   }
@@ -256,6 +260,52 @@ export class GanopolyCardComponent implements OnInit {
       }
     }
     return eligible;
+  }
+
+
+  canPlayHouseOrHotel(card: Card): boolean {
+    if (!this.card || !this.players) return false;
+
+    const human = this.players.find(p => p.name.toLowerCase() === 'human');
+    if (!human) return false;
+
+    // On ne peut pas placer sur les gares ou les utilities
+    const forbiddenSets = [PropertySet.Railroad, PropertySet.UtilityElec, PropertySet.UtilityWater];
+
+    // Récupérer les séries complètes du joueur humain
+    const eligibleSeries = this.getEligibleSeries(card).filter(series => !forbiddenSets.includes(series.color));
+
+    if (card.setAction === ActionSet.House) {
+      // On peut poser une maison sur une série complète qui n'a pas encore de maison
+      return eligibleSeries.some(series => !series.cards.some(c => c.hasHouse));
+    }
+
+    if (card.setAction === ActionSet.Hotel) {
+      // On peut poser un hôtel sur une série qui a déjà une maison mais pas d'hôtel
+      return eligibleSeries.some(series =>
+        series.cards.some(c => c.hasHouse) && !series.cards.some(c => c.hasHotel)
+      );
+    }
+
+    return false;
+  }
+
+  onPlaceHouseOrHotel(seriesColor: PropertySet) {
+    if (!this.card) return;
+    const human = this.players.find(p => p.name.toLowerCase() === 'human');
+    if (!human) return;
+
+    const series = human.properties.filter(p => p.setType === seriesColor);
+
+    if (this.card.setAction === ActionSet.House) {
+      series.forEach(c => c.hasHouse = true);
+    } else if (this.card.setAction === ActionSet.Hotel) {
+      series.forEach(c => c.hasHotel = true);
+    }
+
+    // On considère la carte comme jouée
+    this.card.playAction = true;
+    this.selectionChange.emit({ card: this.card, selected: true });
   }
 
 }

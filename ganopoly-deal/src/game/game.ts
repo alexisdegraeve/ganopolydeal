@@ -516,10 +516,16 @@ export class GameComponent {
           return;
         }
 
+        const eligibleColors = this.getEligibleSeriesForHouseOrHotel(currentPlayer, card);
+        if (eligibleColors.length > 0) {
+          card.targetSeries = eligibleColors[0]; // IA prend la première série valide
+          currentPlayer.properties.push(card);
+        }
+
         // Trouver les propriétés du joueur dans la série choisie
-        const selectedProps = currentPlayer.properties.filter(
-          pr => pr.setType === card.targetSeries
-        );
+        // const selectedProps = currentPlayer.properties.filter(
+        //   pr => pr.setType === card.targetSeries
+        // );
 
         // On ajoute simplement la carte House/Hotel dans cette série
         currentPlayer.properties.push(card);
@@ -586,6 +592,11 @@ export class GameComponent {
       return player.hand.length < 5;
     }
 
+    // Nouvelle vérif Maison / Hôtel
+    if (card.setAction === ActionSet.House || card.setAction === ActionSet.Hotel) {
+      return this.canPlayHouseOrHotel(player, card);
+    }
+
     // Autres cartes Action jouables par défaut
     return true;
   }
@@ -642,6 +653,82 @@ export class GameComponent {
       if (cards.length < needed) {
         eligible.push(...cards);
       }
+    }
+
+    return eligible;
+  }
+
+
+  canPlayHouseOrHotel(player: Player, card: Card): boolean {
+    if (!card) return false;
+    if (card.setAction !== ActionSet.House && card.setAction !== ActionSet.Hotel) return false;
+
+    // On ne peut pas jouer sur gares ou services publics
+    const eligibleProps = player.properties.filter(p =>
+      p.setType !== PropertySet.Railroad &&
+      p.setType !== PropertySet.UtilityElec &&
+      p.setType !== PropertySet.UtilityWater
+    );
+
+    // On groupe par couleur
+    const sets: Record<PropertySet, Card[]> = {} as any;
+    for (const prop of eligibleProps) {
+      if (!prop.setType) continue;
+      const color = prop.setType as PropertySet;
+      if (!sets[color]) sets[color] = [];
+      sets[color].push(prop);
+    }
+
+    for (const [colorKey, cards] of Object.entries(sets)) {
+      const color = colorKey as PropertySet;
+
+      // House : on peut ajouter si pas déjà de House
+      if (card.setAction === ActionSet.House) {
+        const hasHouse = cards.some(c => c.setAction === ActionSet.House);
+        const fullSet = this.isSetComplete(color, cards);
+        if (fullSet && !hasHouse) return true;
+      }
+
+      // Hotel : on peut ajouter si House déjà posée et pas déjà d'Hotel
+      if (card.setAction === ActionSet.Hotel) {
+        const hasHouse = cards.some(c => c.setAction === ActionSet.House);
+        const hasHotel = cards.some(c => c.setAction === ActionSet.Hotel);
+        const fullSet = this.isSetComplete(color, cards);
+        if (fullSet && hasHouse && !hasHotel) return true;
+      }
+    }
+
+    return false;
+  }
+
+  private isSetComplete(color: PropertySet, cards: Card[]): boolean {
+    const requiredByColor: Partial<Record<PropertySet, number>> = {
+      [PropertySet.Brown]: 2,
+      [PropertySet.DarkBlue]: 2
+    };
+    const needed = requiredByColor[color] ?? 3;
+    return cards.filter(c => c.type === CardType.Property).length >= needed;
+  }
+
+  getEligibleSeriesForHouseOrHotel(player: Player, card: Card): PropertySet[] {
+    const eligible: PropertySet[] = [];
+    const sets: Record<PropertySet, Card[]> = {} as any;
+
+    for (const prop of player.properties) {
+      if (!prop.setType) continue;
+      const color = prop.setType as PropertySet;
+      if (!sets[color]) sets[color] = [];
+      sets[color].push(prop);
+    }
+
+    for (const [colorKey, cards] of Object.entries(sets)) {
+      const color = colorKey as PropertySet;
+      const hasHouse = cards.some(c => c.setAction === ActionSet.House);
+      const hasHotel = cards.some(c => c.setAction === ActionSet.Hotel);
+      const fullSet = this.isSetComplete(color, cards);
+
+      if (card.setAction === ActionSet.House && fullSet && !hasHouse) eligible.push(color);
+      if (card.setAction === ActionSet.Hotel && fullSet && hasHouse && !hasHotel) eligible.push(color);
     }
 
     return eligible;

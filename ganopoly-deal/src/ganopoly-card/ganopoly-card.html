@@ -142,7 +142,7 @@
 
             @for(series of getEligibleSeries(card); track series.color) {
 
-            <input type="radio" class="btn-check" name="series-{{ card.id }}" id="series-{{ card.id }}-{{ series.color }}" [checked]="card.targetSeries === series.color" (change)="card.targetSeries = series.color">
+            <input type="radio" (change)="onPlaceHouseOrHotel(series.color)" class="btn-check" name="series-{{ card.id }}" id="series-{{ card.id }}-{{ series.color }}" [checked]="card.targetSeries === series.color" (change)="card.targetSeries = series.color">
 
             <label class="btn btn-outline-success" for="series-{{ card.id }}-{{ series.color }}">
           {{ series.color }} ({{ series.cards.length }} cards)
