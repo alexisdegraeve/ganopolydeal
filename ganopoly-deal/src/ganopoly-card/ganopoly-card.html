@@ -54,7 +54,7 @@
                   'prop-joker': card?.setType === PropertySet.Multi
                 }">
                     </div>
-                    @if(card?.jokerColor){ Chosen color: {{ card?.jokerColor }}} } @if(card?.type === CardType.Property) {
+                    @if(card?.jokerColor && readOnly){ Chosen color: {{ card?.jokerColor }}} } @if(card?.type === CardType.Property) {
                     <div [ngClass]="{
                   'prop-dark-blue': card?.setType === PropertySet.DarkBlue,
                   'prop-brown': card?.setType === PropertySet.Brown,
@@ -202,7 +202,7 @@
         <label class="fw-bold">Choose a color for the Joker:</label>
         <div class="btn-group-vertical w-100 mt-2">
             @for(color of getAvailableJokerColors(card); track $index) {
-            <input type="radio" class="btn-check" name="jokercolor-{{ card.id }}" id="jokercolor-{{ card.id }}-{{ color }}" [checked]="card.setType === color" (change)="onJokerColorSelected(color)" />
+            <input type="radio" class="btn-check" name="jokercolor-{{ card.id }}" id="jokercolor-{{ card.id }}-{{ color }}" [checked]="card.jokerColor === color" (change)="onJokerColorSelected(color)" />
             <label class="btn btn-outline-success" for="jokercolor-{{ card.id }}-{{ color }}">
           {{ color }}
         </label> }

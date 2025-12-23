@@ -64,7 +64,7 @@
             @for(card of player.hand; track $index) {
 
             <ganopoly-card [selectedCards$]="selectedCards$" [readOnly]="false" [players]="players" [card]="card " (selectionChange)="onCardSelectionChange($event) "></ganopoly-card>
-            @if(card.jokerColor){ <span>color selected: {{card.jokerColor}}</span>} }
+            }
 
 
 

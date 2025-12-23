@@ -343,10 +343,14 @@ export class GanopolyCardComponent implements OnInit {
 
 
   canTakePropertyJoker(card: Card | undefined): boolean {
-    if (card && card.type !== CardType.PropertyJoker) return true;
+    if (!card) return false;
+    if (card.type !== CardType.PropertyJoker) return true;
 
     const human = this.getHuman();
-    return !!human && human.properties.length > 0;
+    if (!human || human.properties.length === 0) return false;
+
+    const availableColors = this.getAvailableJokerColors(card);
+    return availableColors.length > 0;
   }
 
 }
