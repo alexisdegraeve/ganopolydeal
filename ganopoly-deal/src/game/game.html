@@ -42,6 +42,15 @@
         }
       {{ player.name}}</span> You can find money, properties, and action cards.</div>
 
+        <div class="player-infos">
+
+            @if (player.hand.length - selectedCards$.getValue().length > 7) {
+            <div class="alert alert-warning" role="alert">You must play cards until you have at most 7 cards in hand.</div>
+            } @if (selectedCards$.getValue().length > 3) {
+            <div class="alert alert-warning" role="alert">You can select a maximum of 3 cards.</div>
+            } @if((currentPlayerIndex | async) === 2) {<button [disabled]="isEndTurnDisabled(player)" class="btn btn-success" (click)="endturn()">END TURN</button> }
+        </div>
+
         @if(player.name.toLowerCase() === 'human') { @if(alertMessage) {
         <div class="alert alert-warning alert-dismissible fade show" role="alert">
             {{ alertMessage }}
@@ -54,14 +63,7 @@
             <ganopoly-card [selectedCards$]="selectedCards$" [readOnly]="false" [players]="players" [card]="card " (selectionChange)="onCardSelectionChange($event) "></ganopoly-card>
             @if(card.jokerColor){ <span>color selected: {{card.jokerColor}}</span>} }
 
-            <div class="player-infos">
 
-                @if (player.hand.length - selectedCards$.getValue().length > 7) {
-                <div class="alert alert-warning" role="alert">You must play cards until you have at most 7 cards in hand.</div>
-                } @if (selectedCards$.getValue().length > 3) {
-                <div class="alert alert-warning" role="alert">You can select a maximum of 3 cards.</div>
-                } @if((currentPlayerIndex | async) === 2) {<button [disabled]="isEndTurnDisabled(player)" class="btn btn-success" (click)="endturn()">END TURN</button> }
-            </div>
 
         </div>
         } @else {
@@ -114,12 +116,12 @@
         <button class="btn btn-primary" (click)="takeCards(5, 'human')">Take 5 Cards </button> } -->
 
     </div>
-
+    <!--
     <div class="debug">
         Remaining DECK @if (remainingDeck$ | async; as remainingDeck) { @for(card of remainingDeck; track $index) {
         <ganopoly-card [card]="card"></ganopoly-card>
         } }
     </div>
-
+    -->
 </div>
 } }
