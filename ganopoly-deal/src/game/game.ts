@@ -29,6 +29,7 @@ export class GameComponent {
   alertMessage: string | null = null;
   gameOverReason: 'win' | 'draw' | null = null;
   winner: Player | null = null;
+  iaMessages$ = new BehaviorSubject<Record<number, string>>({});
 
 
 
@@ -208,7 +209,7 @@ export class GameComponent {
   private playPropertiesJoker(player: Player) {
     const jokers = player.hand.filter(c => c.type === CardType.PropertyJoker);
     jokers.forEach(card => {
-      card.jokerColor  = this.chooseJokerColorForAI(player, card);
+      card.jokerColor = this.chooseJokerColorForAI(player, card);
       this.moveCardToProperties(player, card);
     });
   }
@@ -270,16 +271,34 @@ export class GameComponent {
   }
 
   private playActions(player: Player) {
-    // Priorité : actions qui permettent de voler une propriété ou doubler le loyer
     const players = [...this.players$.getValue()];
-    const actionCards = player.hand.filter(c => c.type === 'action');
+    const actionCards = player.hand.filter(c => c.type === CardType.Action);
+
     actionCards.forEach(card => {
       if (this.shouldPlayAction(card)) {
-        this.applyAction(card, player, players);
-        //this.playAction(player, card);
+
+        // Message UI pour l’IA
+        if (player.name.toLowerCase() !== 'human') {
+          this.showIAMessage(player, `Playing action: ${card.setAction}`);
+        }
+
+        // Jouer l’action
+        if (card.setAction === ActionSet.Joker) {
+          card.playAction = true;
+          this.playJokerAction(card, player, players);
+        } else {
+          this.applyAction(card, player, players);
+        }
+
+        // Retirer la carte de la main
+        player.hand = player.hand.filter(c => c !== card);
+
+        // Mettre à jour l’observable
+        this.players$.next(players);
       }
     });
   }
+
 
   private drawCards(player: Player) {
     // Tirer 2 cartes si possible
@@ -345,12 +364,10 @@ export class GameComponent {
           // - place into a global discard pile
           // - or store actions played by human
           console.log('check playACtion : ', card.playAction);
-          if (card.playAction) {
-            // store
-            // const actionDeck = this.actionDeck$.getValue();
-            // actionDeck.push(card);
-            // this.actionDeck$.next(actionDeck);
+          if (card.setAction === ActionSet.Joker && card.playAction) {
             console.log('applyaction ', card);
+            this.playJokerAction(card, human, players);
+          } else if (card.playAction) {
             this.applyAction(card, human, players);
           } else {
             human.money.push(card);
@@ -390,6 +407,30 @@ export class GameComponent {
     // Joueur suivant
     this.goToNextPlayer();
   }
+
+  private playJokerAction(card: Card, currentPlayer: Player, players: Player[]) {
+    // 1️⃣ Vérifier s'il y a une action à annuler
+    const lastActionCard = this.actionDeck$.getValue().at(-1);
+    if (!lastActionCard || lastActionCard.setAction === ActionSet.Joker) {
+      this.showAlert('No action to cancel.');
+      return;
+    }
+
+    // 2️⃣ IA ou humain peut contrecarrer avec un autre Joker
+    const targetPlayer = players.find(p => p.id === lastActionCard.actionTargetId) ?? currentPlayer;
+
+    // 3️⃣ Retirer l'action ciblée de la pile
+    let actionDeck = this.actionDeck$.getValue();
+    actionDeck = actionDeck.filter(c => c !== lastActionCard);
+    this.actionDeck$.next(actionDeck);
+
+    this.showAlert(`${currentPlayer.name} cancelled the action of ${targetPlayer.name}!`);
+
+    // 4️⃣ Ajouter le Joker à la pile d'actions (si besoin pour historique)
+    actionDeck.push(card);
+    this.actionDeck$.next(actionDeck);
+  }
+
 
   goToNextPlayer() {
     let index = this.currentPlayerIndex.getValue();
@@ -610,6 +651,10 @@ export class GameComponent {
 
       default:
         console.warn('Action non implémentée', card.setAction);
+    }
+
+    if (currentPlayer.name.toLowerCase() !== 'human') {
+      this.showIAMessage(currentPlayer, `${currentPlayer.name} applies ${card.setAction} on ${target.name}`);
     }
   }
 
@@ -860,5 +905,17 @@ export class GameComponent {
     return deckEmpty && !this.winner;
   }
 
+  showIAMessage(player: Player, message: string, duration = 3000) {
+    const current = { ...this.iaMessages$.getValue() };
+    current[player.id] = message;
+    this.iaMessages$.next(current);
+
+    // Supprimer le message après un certain temps
+    setTimeout(() => {
+      const updated = { ...this.iaMessages$.getValue() };
+      delete updated[player.id];
+      this.iaMessages$.next(updated);
+    }, duration);
+  }
 
 }
