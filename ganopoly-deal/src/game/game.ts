@@ -105,15 +105,15 @@ export class GameComponent {
       // Distribute cards
       const players: Player[] = [
         { id: 1, hand: shuffleCards.slice(0, 5), name: "Alice", properties: [], money: [], actions: [], doubleRent: false },
-        { id: 2, hand: shuffleCards.slice(5, 10), name: "Tom", properties: [], money: [], actions: [], doubleRent: false },
-        { id: 3, hand: shuffleCards.slice(10, 15), name: "John", properties: [], money: [], actions: [], doubleRent: false },
-        { id: 4, hand: shuffleCards.slice(15, 22), name: "Human", properties: [], money: [], actions: [], doubleRent: false } // + 2Cards
+        // { id: 2, hand: shuffleCards.slice(5, 10), name: "Tom", properties: [], money: [], actions: [], doubleRent: false },
+        { id: 2, hand: shuffleCards.slice(5, 10), name: "John", properties: [], money: [], actions: [], doubleRent: false },
+        { id: 3, hand: shuffleCards.slice(10, 17), name: "Human", properties: [], money: [], actions: [], doubleRent: false } // + 2Cards
       ];
 
 
-      const remainingDeck = shuffleCards.slice(22);
+      const remainingDeck = shuffleCards.slice(17);
       this.players$.next(players);
-      this.currentPlayerIndex.next(3);
+      this.currentPlayerIndex.next(2);
       this.remainingDeck$.next(remainingDeck);
 
     })
@@ -335,7 +335,7 @@ export class GameComponent {
           // You can either:
           // - place into a global discard pile
           // - or store actions played by human
-          console.log('check playACtion : ',card.playAction);
+          console.log('check playACtion : ', card.playAction);
           if (card.playAction) {
             // store
             // const actionDeck = this.actionDeck$.getValue();
@@ -371,8 +371,8 @@ export class GameComponent {
     // 5️⃣ Pass turn to next player (AI)
     //this.playNextAITurn();
 
-      // Vérifie victoire après tour humain
-  if (this.checkWin()) return;
+    // Vérifie victoire après tour humain
+    if (this.checkWin()) return;
 
     // Joueur suivant
     this.goToNextPlayer();
@@ -418,14 +418,14 @@ export class GameComponent {
 
 
   applyAction(card: Card, currentPlayer: Player, players: Player[]) {
-    console.log('ard.playAction ', card.playAction );
+    console.log('ard.playAction ', card.playAction);
     console.log('ard.actionTargetId ', card.actionTargetId);
     if (!card.playAction || (!card.actionTargetId && card.setAction !== ActionSet.PassGo)) return;
 
     // 1️⃣ Trouver le joueur ciblé
     let target = players.find(p => p.id === card.actionTargetId);
     console.log('target ', target);
-    if (!target)  {
+    if (!target) {
       target = currentPlayer;
       console.log('PassGo cible = currentPlayer', target.name);
     }
@@ -795,36 +795,42 @@ export class GameComponent {
 
 
   private checkWin() {
-  const players = this.players$.getValue();
-  for (const player of players) {
-    const completedSets = this.getCompletedSets(player);
-    if (completedSets >= 3) {
-      this.winner = player;  // on stocke le gagnant
-      this.startGame = false; // stoppe le jeu
-      return true;
+    const players = this.players$.getValue();
+    for (const player of players) {
+      const completedSets = this.getCompletedSets(player);
+      if (completedSets >= 3) {
+        this.winner = player;  // on stocke le gagnant
+        this.startGame = false; // stoppe le jeu
+        return true;
+      }
     }
-  }
-  return false;
-}
-
-
-
-private getCompletedSets(player: Player): number {
-  const sets: Record<PropertySet, Card[]> = {} as any;
-  for (const prop of player.properties) {
-    if (!prop.setType) continue;
-    const color = prop.setType as PropertySet;
-    if (!sets[color]) sets[color] = [];
-    sets[color].push(prop);
+    return false;
   }
 
-  let count = 0;
-  for (const [colorKey, cards] of Object.entries(sets)) {
-    const color = colorKey as PropertySet;
-    if (this.isSetComplete(color, cards)) count++;
+
+
+  private getCompletedSets(player: Player): number {
+    const sets: Record<PropertySet, Card[]> = {} as any;
+    for (const prop of player.properties) {
+      if (!prop.setType) continue;
+      const color = prop.setType as PropertySet;
+      if (!sets[color]) sets[color] = [];
+      sets[color].push(prop);
+    }
+
+    let count = 0;
+    for (const [colorKey, cards] of Object.entries(sets)) {
+      const color = colorKey as PropertySet;
+      if (this.isSetComplete(color, cards)) count++;
+    }
+    return count;
   }
-  return count;
-}
+
+  checkDraw(): boolean {
+  const deckEmpty = this.remainingDeck$.getValue().length === 0;
+  const noWinner = this.winner === null;
+  return deckEmpty && noWinner;
+  }
 
 
 }

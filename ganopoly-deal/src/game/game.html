@@ -19,7 +19,15 @@
     }
     <button class="btn btn-success mt-3" (click)="newGame()">Restart Game</button>
 </div>
-} @if (!winner) {
+}
+
+<!-- DRAW SCREEN -->
+@if (!winner && checkDraw()) {
+<div class="draw-screen text-center p-5">
+    <h2>Match Nul !</h2>
+    <button class="btn btn-success mt-3" (click)="newGame()">Restart Game</button>
+</div>
+} @if (!winner && !checkDraw()) {
 <div class="game ">
 
     @if (players$ | async; as players) { @for(player of players; track $index) {
@@ -54,7 +62,7 @@
                 <div class="alert alert-warning" role="alert">You must play cards until you have at most 7 cards in hand.</div>
                 } @if (selectedCards$.getValue().length > 3) {
                 <div class="alert alert-warning" role="alert">You can select a maximum of 3 cards.</div>
-                } @if((currentPlayerIndex | async) === 3) {<button [disabled]="isEndTurnDisabled(player)" class="btn btn-success" (click)="endturn()">END TURN</button> }
+                } @if((currentPlayerIndex | async) === 2) {<button [disabled]="isEndTurnDisabled(player)" class="btn btn-success" (click)="endturn()">END TURN</button> }
             </div>
 
         </div>
