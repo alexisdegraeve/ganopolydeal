@@ -332,6 +332,7 @@ export class GameComponent {
             this.showAlert('Please choose a color for the Joker before playing it');
             continue; // ne pas poser la carte tant que couleur non choisie
           }
+          console.log('push property joker ', card, human.properties);
           human.properties.push(card);
           break;
 

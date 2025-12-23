@@ -197,11 +197,7 @@
 
     </div>
 
-    @if(card && selected && card.type === CardType.PropertyJoker) { @if(getAvailableJokerColors(card).length === 0) {
-    <div class="alert alert-warning mt-2">
-        No valid color available for this Joker.
-    </div>
-    } @else {
+    @if(card && selected && card.type === CardType.PropertyJoker) {
     <div class="mt-3">
         <label class="fw-bold">Choose a color for the Joker:</label>
         <div class="btn-group-vertical w-100 mt-2">
@@ -212,5 +208,5 @@
         </label> }
         </div>
     </div>
-    } } } }
+    } } }
 </div>

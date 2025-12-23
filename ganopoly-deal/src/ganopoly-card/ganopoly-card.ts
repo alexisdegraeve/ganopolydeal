@@ -47,7 +47,7 @@ export class GanopolyCardComponent implements OnInit {
     const allowed = this.getAvailableJokerColors(this.card);
     if (!allowed.includes(color)) return;
 
-    this.card.setType = color;
+    this.card.jokerColor = color;
     this.selected = true;
     this.selectionChange.emit({ card: this.card, selected: true });
   }
