@@ -308,11 +308,13 @@ export class GameComponent {
           // You can either:
           // - place into a global discard pile
           // - or store actions played by human
+          console.log('check playACtion : ',card.playAction);
           if (card.playAction) {
             // store
             // const actionDeck = this.actionDeck$.getValue();
             // actionDeck.push(card);
             // this.actionDeck$.next(actionDeck);
+            console.log('applyaction ', card);
             this.applyAction(card, human, players);
           } else {
             human.money.push(card);
@@ -384,11 +386,17 @@ export class GameComponent {
 
 
   applyAction(card: Card, currentPlayer: Player, players: Player[]) {
-    if (!card.playAction || !card.actionTargetId) return;
+    console.log('ard.playAction ', card.playAction );
+    console.log('ard.actionTargetId ', card.actionTargetId);
+    if (!card.playAction || (!card.actionTargetId && card.setAction !== ActionSet.PassGo)) return;
 
     // 1️⃣ Trouver le joueur ciblé
-    const target = players.find(p => p.id === card.actionTargetId);
-    if (!target) return;
+    let target = players.find(p => p.id === card.actionTargetId);
+    console.log('target ', target);
+    if (!target)  {
+      target = currentPlayer;
+      console.log('PassGo cible = currentPlayer', target.name);
+    }
 
     switch (card.setAction) {
 
@@ -537,6 +545,7 @@ export class GameComponent {
 
 
       case ActionSet.PassGo:
+        console.log('Pass GO actif pour ', currentPlayer.name);
         this.takeCards(2, currentPlayer.name);
         break;
 
@@ -617,31 +626,7 @@ export class GameComponent {
 
   }
 
-  canPlayActionCard(player: Player, card: Card): boolean {
-    if (!player) return false;
 
-    // Carte Rent
-    if (card.setAction === ActionSet.Rent) {
-      const rentColors: PropertySet[] = card.sets || [];
-      const hasProperty = rentColors.some(color =>
-        player.properties.some(p => p.setType === color || p.setType2 === color)
-      );
-      return hasProperty;
-    }
-
-    // Carte PassGo : désactiver si main pleine
-    if (card.setAction === ActionSet.PassGo) {
-      return player.hand.length < 5;
-    }
-
-    // Nouvelle vérif Maison / Hôtel
-    if (card.setAction === ActionSet.House || card.setAction === ActionSet.Hotel) {
-      return this.canPlayHouseOrHotel(player, card);
-    }
-
-    // Autres cartes Action jouables par défaut
-    return true;
-  }
 
 
   getDefaultRentColor(player: Player, card: Card): PropertySet | null {
