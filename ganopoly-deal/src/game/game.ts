@@ -149,7 +149,7 @@ export class GameComponent {
     this.playPropertiesJoker(player);
 
     // 2. Poser des billets si main trop pleine
-    this.playMoneyIfHandFull(player);
+    this.limitAIHand(player);
 
     // 3. Jouer les actions offensives intelligemment
     this.playActions(player);
@@ -158,19 +158,42 @@ export class GameComponent {
     this.drawCards(player);
   }
 
-  private playMoneyIfHandFull(player: Player) {
-    const moneyCards = player.hand.filter(c => c.type === CardType.Money);
-    // Si main > 5 cartes, poser les billets pour se protéger
-    if (player.hand.length > 5) {
-      const moneyCards = player.hand.filter(c => c.type === 'money');
-      moneyCards.forEach(card => this.moveCardToMoney(player, card));
-    }
 
-    // 2️⃣ Choix stratégique léger (30% du temps)
-    if (moneyCards.length > 0 && Math.random() < 0.3) {
-      this.moveCardToMoney(player, moneyCards[0]);
+  private limitAIHand(player: Player) {
+    const MAX_HAND = 7;
+    while (player.hand.length > MAX_HAND) {
+      // On pose automatiquement des billets si possible
+      const moneyCard = player.hand.find(c => c.type === CardType.Money);
+      if (moneyCard) {
+        this.moveCardToMoney(player, moneyCard);
+      } else {
+        // Si pas de Money, poser une propriété aléatoire ou action perdue dans la pile d'actions
+        const card = player.hand.pop()!;
+        if (card.type === CardType.Property || card.type === CardType.PropertyJoker) {
+          player.properties.push(card);
+        } else {
+          const actionDeck = this.actionDeck$.getValue();
+          actionDeck.push(card);
+          this.actionDeck$.next(actionDeck);
+        }
+      }
     }
   }
+
+
+  // private playMoneyIfHandFull(player: Player) {
+  //   const moneyCards = player.hand.filter(c => c.type === CardType.Money);
+  //   // Si main > 5 cartes, poser les billets pour se protéger
+  //   if (player.hand.length > 5) {
+  //     const moneyCards = player.hand.filter(c => c.type === 'money');
+  //     moneyCards.forEach(card => this.moveCardToMoney(player, card));
+  //   }
+
+  //   // 2️⃣ Choix stratégique léger (30% du temps)
+  //   if (moneyCards.length > 0 && Math.random() < 0.3) {
+  //     this.moveCardToMoney(player, moneyCards[0]);
+  //   }
+  // }
 
   private playPropertiesJoker(player: Player) {
     const jokers = player.hand.filter(c => c.type === CardType.PropertyJoker);
