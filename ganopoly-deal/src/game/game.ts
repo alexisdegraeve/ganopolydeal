@@ -226,10 +226,10 @@ export class GameComponent {
   }
 
 
-  private playAction(player: Player, card: Card) {
-    player.hand = player.hand.filter(c => c !== card);
-    player.actions.push(card);
-  }
+  // private playAction(player: Player, card: Card) {
+  //   player.hand = player.hand.filter(c => c !== card);
+  //   player.actions.push(card);
+  // }
 
   private shouldPlayAction(card: Card): boolean {
     // IA moyenne : jouer action seulement si gain immédiat
@@ -238,10 +238,12 @@ export class GameComponent {
 
   private playActions(player: Player) {
     // Priorité : actions qui permettent de voler une propriété ou doubler le loyer
+    const players = [...this.players$.getValue()];
     const actionCards = player.hand.filter(c => c.type === 'action');
     actionCards.forEach(card => {
       if (this.shouldPlayAction(card)) {
-        this.playAction(player, card);
+        this.applyAction(card, player, players);
+        //this.playAction(player, card);
       }
     });
   }
