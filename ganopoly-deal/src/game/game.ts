@@ -208,7 +208,7 @@ export class GameComponent {
   private playPropertiesJoker(player: Player) {
     const jokers = player.hand.filter(c => c.type === CardType.PropertyJoker);
     jokers.forEach(card => {
-      card.setType = this.chooseJokerColorForAI(player, card);
+      card.jokerColor  = this.chooseJokerColorForAI(player, card);
       this.moveCardToProperties(player, card);
     });
   }
@@ -328,7 +328,7 @@ export class GameComponent {
           break;
 
         case CardType.PropertyJoker:
-          if (!card.setType) {
+          if (!card.jokerColor) {
             this.showAlert('Please choose a color for the Joker before playing it');
             continue; // ne pas poser la carte tant que couleur non choisie
           }
@@ -360,7 +360,11 @@ export class GameComponent {
 
     // 2️⃣ Remove selected cards from the human hand
     human.hand = human.hand.filter(
-      c => !this.selectedCards$.getValue().some(s => s.id === c.id)
+      c =>
+        !this.selectedCards$.getValue().some(s =>
+          s.id === c.id &&
+          !(s.type === CardType.PropertyJoker && !s.jokerColor)
+        )
     );
 
     // 3️⃣ Reset UI selections

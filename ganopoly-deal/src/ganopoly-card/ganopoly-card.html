@@ -54,7 +54,7 @@
                   'prop-joker': card?.setType === PropertySet.Multi
                 }">
                     </div>
-                    } @if(card?.type === CardType.Property) {
+                    @if(card?.jokerColor){ Chosen color: {{ card?.jokerColor }}} } @if(card?.type === CardType.Property) {
                     <div [ngClass]="{
                   'prop-dark-blue': card?.setType === PropertySet.DarkBlue,
                   'prop-brown': card?.setType === PropertySet.Brown,

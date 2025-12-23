@@ -102,6 +102,7 @@ export interface Card {
   duelTargetPropId?: number;
   hasHouse?: boolean;
   hasHotel?: boolean;
+  jokerColor?: PropertySet;
 }
 
 export const ALL_PROPERTY_COLORS = [
