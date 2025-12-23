@@ -275,17 +275,31 @@ export class GameComponent {
   //   player.actions.push(card);
   // }
 
-  private shouldPlayAction(card: Card): boolean {
-    // IA moyenne : jouer action seulement si gain immédiat
-    return true; // Exemple simple
-  }
+private shouldPlayAction(card: Card, player: Player, players: Player[]): boolean {
+  if (this.getCompletedSets(player) >= 2) return true;
+
+  if (card.setAction === ActionSet.Rent)
+    return players.some(p => p.id !== player.id && p.money.length > 0);
+
+  if (card.setAction && [ActionSet.DealDuel, ActionSet.DealSwap, ActionSet.DealBanco]
+      .includes(card.setAction))
+    return players.some(p => this.getCompletedSets(p) >= 1);
+
+  if (card.setAction === ActionSet.Birthday)
+    return players.some(p => p.id !== player.id && p.money.length > 0);
+
+  if (card.setAction && [ActionSet.House, ActionSet.Hotel].includes(card.setAction))
+    return this.canPlayHouseOrHotel(player, card);
+
+  return false;
+}
 
   private playActions(player: Player) {
     const players = [...this.players$.getValue()];
     const actionCards = player.hand.filter(c => c.type === CardType.Action);
 
     actionCards.forEach(card => {
-      if (this.shouldPlayAction(card)) {
+      if (this.shouldPlayAction(card, player, players)) {
 
         // Message UI pour l’IA
         if (player.name.toLowerCase() !== 'human') {
@@ -494,6 +508,21 @@ export class GameComponent {
   //   this.players$.next(players); // update observable pour UI
   // }
 
+  getStealableFullSets(player: Player) {
+  const sets: Record<PropertySet, Card[]> = {} as any;
+  for (const p of player.properties) {
+    if (!p.setType) continue;
+    const c = p.setType as PropertySet;
+    if (!sets[c]) sets[c] = [];
+    sets[c].push(p);
+  }
+
+  return Object.entries(sets)
+    .filter(([color, cards]) => this.isSetComplete(color as PropertySet, cards))
+    .map(([color, cards]) => ({ color, cards }));
+}
+
+
 
   applyAction(card: Card, currentPlayer: Player, players: Player[]) {
     console.log('ard.playAction ', card.playAction);
@@ -512,11 +541,14 @@ export class GameComponent {
 
       case ActionSet.DealBanco:
         // Exemple : voler une somme d'argent (ici on prend la 1ère carte Money)
-        if (target.money.length > 0) {
-          const stolen = target.money.shift()!;
-          currentPlayer.money.push(stolen);
-        }
-        break;
+        const stealableSets = this.getStealableFullSets(target);
+        if (!stealableSets.length) break;
+
+        const chosen = stealableSets[Math.floor(Math.random() * stealableSets.length)];
+
+        target.properties = target.properties.filter(p => !chosen.cards.includes(p));
+        currentPlayer.properties.push(...chosen.cards);
+          break;
 
       case ActionSet.DealSwap:
         // Exemple : échanger une propriété entre joueur et cible
@@ -540,10 +572,6 @@ export class GameComponent {
       case ActionSet.DealDuel:
         this.playActionDealDuel(target, card, currentPlayer);
         // Exemple : duel, le gagnant prend une carte aléatoire
-        if (target.hand.length > 0) {
-          const cardTaken = target.hand.splice(Math.floor(Math.random() * target.hand.length), 1)[0];
-          currentPlayer.hand.push(cardTaken);
-        }
         break;
 
       case ActionSet.Joker:
