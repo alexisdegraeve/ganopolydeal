@@ -190,14 +190,18 @@
   </label>
 
         <!-- Take -->
-        <input type="radio" class="btn-check" name="pickState-{{card?.id}}" id="take-{{card?.id}}" [checked]="selected" (change)="onPickStateChange(true)">
+        <input type="radio" class="btn-check" name="pickState-{{card?.id}}" id="take-{{card?.id}}" [checked]="selected" (change)="onPickStateChange(true)" [disabled]="card?.type === CardType.PropertyJoker && !canTakePropertyJoker(card)">
         <label class="btn btn-outline-danger" for="take-{{card?.id}}">
     <i class="bi bi-hand-index-fill me-2"></i>  Take
   </label>
 
     </div>
 
-    @if(card && selected && card.type === CardType.PropertyJoker) {
+    @if(card && selected && card.type === CardType.PropertyJoker) { @if(getAvailableJokerColors(card).length === 0) {
+    <div class="alert alert-warning mt-2">
+        No valid color available for this Joker.
+    </div>
+    } @else {
     <div class="mt-3">
         <label class="fw-bold">Choose a color for the Joker:</label>
         <div class="btn-group-vertical w-100 mt-2">
@@ -208,5 +212,5 @@
         </label> }
         </div>
     </div>
-    } } }
+    } } } }
 </div>

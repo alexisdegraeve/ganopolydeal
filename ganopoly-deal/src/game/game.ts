@@ -27,6 +27,7 @@ export class GameComponent {
   startGame = false;
   lastActionCard$ = this.actionDeck$.pipe(map(deck => deck.at(-1) || null));
   alertMessage: string | null = null;
+  gameOverReason: 'win' | 'draw' | null = null;
   winner: Player | null = null;
 
 
@@ -123,6 +124,13 @@ export class GameComponent {
   newGame() {
     console.log('New Game');
     this.startGame = true;
+    this.winner = null;
+    this.gameOverReason = null;
+
+    this.players$.next([]);
+    this.remainingDeck$.next([]);
+    this.actionDeck$.next([]);
+    this.selectedCards$.next([]);
     this.initializeCards();
   }
 
@@ -381,7 +389,7 @@ export class GameComponent {
   goToNextPlayer() {
     let index = this.currentPlayerIndex.getValue();
 
-    // rotate to next
+    // joueur suivant
     index = (index + 1) % this.players$.getValue().length;
     this.currentPlayerIndex.next(index);
 
@@ -390,13 +398,27 @@ export class GameComponent {
 
     if (player.name.toLowerCase() !== 'human') {
       this.playTurn(player);
-      if (this.checkWin()) return;
-      this.goToNextPlayer(); // IA joue 100% automatiquement
     } else {
       this.takeCards(2, 'human');
       this.selectedCards$.next([]);
-      // this.startHumanTurn();
+      return; // on s'arrête ici : attente interaction humaine
     }
+
+    // 🔚 FIN DE TOUR → on vérifie l’état du jeu UNE FOIS
+    if (this.checkWin()) {
+      this.gameOverReason = 'win';
+      this.startGame = false;
+      return;
+    }
+
+    if (this.checkDraw()) {
+      this.gameOverReason = 'draw';
+      this.startGame = false;
+      return;
+    }
+
+    // sinon, on continue automatiquement
+    this.goToNextPlayer();
   }
 
   stopGame() {
@@ -794,18 +816,20 @@ export class GameComponent {
   }
 
 
-  private checkWin() {
+  private checkWin(): boolean {
     const players = this.players$.getValue();
     for (const player of players) {
       const completedSets = this.getCompletedSets(player);
       if (completedSets >= 3) {
-        this.winner = player;  // on stocke le gagnant
-        this.startGame = false; // stoppe le jeu
+        this.winner = player;
+        this.gameOverReason = 'win';
+        this.startGame = false;
         return true;
       }
     }
     return false;
   }
+
 
 
 
@@ -827,9 +851,8 @@ export class GameComponent {
   }
 
   checkDraw(): boolean {
-  const deckEmpty = this.remainingDeck$.getValue().length === 0;
-  const noWinner = this.winner === null;
-  return deckEmpty && noWinner;
+    const deckEmpty = this.remainingDeck$.getValue().length === 0;
+    return deckEmpty && !this.winner;
   }
 
 

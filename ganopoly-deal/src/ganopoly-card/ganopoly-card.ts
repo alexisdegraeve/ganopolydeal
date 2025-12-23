@@ -44,9 +44,10 @@ export class GanopolyCardComponent implements OnInit {
   onJokerColorSelected(color: PropertySet) {
     if (!this.card) return;
 
-    this.card.setType = color;  // On stocke la couleur choisie
-    this.jokerColorSelected.emit({ card: this.card, color });
-    // On peut aussi considérer la carte comme sélectionnée
+    const allowed = this.getAvailableJokerColors(this.card);
+    if (!allowed.includes(color)) return;
+
+    this.card.setType = color;
     this.selected = true;
     this.selectionChange.emit({ card: this.card, selected: true });
   }
@@ -212,21 +213,25 @@ export class GanopolyCardComponent implements OnInit {
 
   getAvailableJokerColors(card: Card): PropertySet[] {
     const human = this.getHuman();
-      if (!human) return [];
+    if (!human) return [];
 
-      const ownedColors = new Set<PropertySet>();
+    const ownedColors = new Set<PropertySet>();
+    for (const prop of human.properties) {
+      if (prop.setType) ownedColors.add(prop.setType);
+      if (prop.setType2) ownedColors.add(prop.setType2);
+    }
 
-      for (const prop of human.properties) {
-        if (prop.setType) ownedColors.add(prop.setType);
-        if (prop.setType2) ownedColors.add(prop.setType2);
-      }
+    // 🔹 Joker NON multi → choix imposé
+    if (card.setType && card.setType !== PropertySet.Multi && card.setType2) {
+      return [card.setType, card.setType2].filter(color =>
+        ownedColors.has(color)
+      );
+    }
 
-      const allowed = card.setType2
-        ? [card.setType!, card.setType2]
-        : Array.from(ownedColors);
-
-      return allowed.filter(color => ownedColors.has(color));
+    // 🔹 Joker multi → toutes les couleurs possédées
+    return Array.from(ownedColors);
   }
+
 
 
   onDuelPropertySelected(propId: number) {
@@ -332,6 +337,14 @@ export class GanopolyCardComponent implements OnInit {
   }
 
   private humanHasProperties(): boolean {
+    const human = this.getHuman();
+    return !!human && human.properties.length > 0;
+  }
+
+
+  canTakePropertyJoker(card: Card | undefined): boolean {
+    if (card && card.type !== CardType.PropertyJoker) return true;
+
     const human = this.getHuman();
     return !!human && human.properties.length > 0;
   }

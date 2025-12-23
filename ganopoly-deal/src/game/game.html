@@ -10,7 +10,7 @@
     <!-- <button class="btn btn-primary" (click)="remove()">REMOVE</button> -->
 </div>
 
-@if (winner) {
+@if (gameOverReason === 'win' && winner) {
 <div class="win-screen text-center p-5">
     @if(winner.name.toLowerCase() === 'human') {
     <h2>Congratulations! You won!</h2>
@@ -22,12 +22,12 @@
 }
 
 <!-- DRAW SCREEN -->
-@if (!winner && checkDraw()) {
+@if (gameOverReason === 'draw') {
 <div class="draw-screen text-center p-5">
     <h2>Match Nul !</h2>
     <button class="btn btn-success mt-3" (click)="newGame()">Restart Game</button>
 </div>
-} @if (!winner && !checkDraw()) {
+} @if (startGame && !gameOverReason) {
 <div class="game ">
 
     @if (players$ | async; as players) { @for(player of players; track $index) {
