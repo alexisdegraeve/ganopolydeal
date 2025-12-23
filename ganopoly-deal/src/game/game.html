@@ -82,10 +82,17 @@
         }
 
 
-        <div class="player-money"> <span class="title">Money</span> @for(card of player.money; track $index) {
-            <ganopoly-card [card]="card"></ganopoly-card>
+        <div class="player-money">
+            <span class="title">Money</span> @for(group of groupMoney(player); track group.value) {
+            <div class="money-group">
+                <div class="group-title">💰 {{ group.value }}M</div>
+                <div class="group-stack">
+                    @for(card of group.cards; track card.id) {
+                    <ganopoly-card [card]="card"></ganopoly-card>
+                    }
+                </div>
+            </div>
             }
-
         </div>
         <div class="player-properties">
             <span class="title">Properties</span> @for(group of groupProperties(player); track group.color) {

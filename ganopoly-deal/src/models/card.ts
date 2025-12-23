@@ -115,3 +115,8 @@ export interface PropertyGroup {
   color: PropertySet;
   cards: Card[];
 }
+
+export interface MoneyGroup {
+  value: number;
+  cards: Card[];
+}

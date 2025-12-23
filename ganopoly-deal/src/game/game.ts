@@ -3,7 +3,7 @@ import { DeckService } from '../app/services/deck';
 import { BehaviorSubject, map, Observable } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { GanopolyCardComponent } from '../ganopoly-card/ganopoly-card';
-import { ActionSet, ALL_PROPERTY_COLORS, Card, CardType, PropertyGroup, PropertySet } from '../models/card';
+import { ActionSet, ALL_PROPERTY_COLORS, Card, CardType, MoneyGroup, PropertyGroup, PropertySet } from '../models/card';
 import { Player } from '../models/player';
 import { HeaderComponent } from '../header/header';
 import { RouterModule } from '@angular/router';
@@ -153,6 +153,8 @@ export class GameComponent {
 
   protected playTurn(player: Player) {
     // 1. Poser les propriétés pour compléter les sets
+
+    this.aiStoreMoney(player);
     this.playProperties(player);
 
     // Property Joker
@@ -169,6 +171,17 @@ export class GameComponent {
 
   }
 
+  private aiStoreMoney(player: Player) {
+    const moneyCards = player.hand.filter(c => c.type === CardType.Money);
+
+    // Toujours garder au moins 1 carte en main pour bluff / défense
+    const MAX_KEEP = 1;
+
+    while (player.hand.filter(c => c.type === CardType.Money).length > MAX_KEEP) {
+      const card = player.hand.find(c => c.type === CardType.Money)!;
+      this.moveCardToMoney(player, card);
+    }
+  }
 
   private limitAIHand(player: Player) {
     const MAX_HAND = 7;
@@ -950,6 +963,21 @@ export class GameComponent {
   isGroupComplete(group: PropertyGroup): boolean {
     const needed = group.cards[0]?.setSize;
     return needed ? group.cards.length >= needed : false;
+  }
+
+  groupMoney(player: Player): MoneyGroup[] {
+    const groups: Record<number, Card[]> = {};
+
+    for (const card of player.money) {
+      const v = card.value ?? 1;
+      if (!groups[v]) groups[v] = [];
+      groups[v].push(card);
+    }
+
+    return Object.entries(groups).map(([value, cards]) => ({
+      value: Number(value),
+      cards
+    }));
   }
 
 }
