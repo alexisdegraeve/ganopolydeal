@@ -27,6 +27,7 @@ export class GameComponent {
   startGame = false;
   lastActionCard$ = this.actionDeck$.pipe(map(deck => deck.at(-1) || null));
   alertMessage: string | null = null;
+  winner: Player | null = null;
 
 
 
@@ -156,6 +157,7 @@ export class GameComponent {
 
     // 4. Fin de tour : tirer 2 cartes si possible
     this.drawCards(player);
+
   }
 
 
@@ -368,6 +370,10 @@ export class GameComponent {
 
     // 5️⃣ Pass turn to next player (AI)
     //this.playNextAITurn();
+
+      // Vérifie victoire après tour humain
+  if (this.checkWin()) return;
+
     // Joueur suivant
     this.goToNextPlayer();
   }
@@ -384,6 +390,7 @@ export class GameComponent {
 
     if (player.name.toLowerCase() !== 'human') {
       this.playTurn(player);
+      if (this.checkWin()) return;
       this.goToNextPlayer(); // IA joue 100% automatiquement
     } else {
       this.takeCards(2, 'human');
@@ -785,6 +792,39 @@ export class GameComponent {
 
     return eligible;
   }
+
+
+  private checkWin() {
+  const players = this.players$.getValue();
+  for (const player of players) {
+    const completedSets = this.getCompletedSets(player);
+    if (completedSets >= 3) {
+      this.winner = player;  // on stocke le gagnant
+      this.startGame = false; // stoppe le jeu
+      return true;
+    }
+  }
+  return false;
+}
+
+
+
+private getCompletedSets(player: Player): number {
+  const sets: Record<PropertySet, Card[]> = {} as any;
+  for (const prop of player.properties) {
+    if (!prop.setType) continue;
+    const color = prop.setType as PropertySet;
+    if (!sets[color]) sets[color] = [];
+    sets[color].push(prop);
+  }
+
+  let count = 0;
+  for (const [colorKey, cards] of Object.entries(sets)) {
+    const color = colorKey as PropertySet;
+    if (this.isSetComplete(color, cards)) count++;
+  }
+  return count;
+}
 
 
 }

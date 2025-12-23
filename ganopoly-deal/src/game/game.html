@@ -9,6 +9,17 @@
     <button class="btn btn-danger" (click)="stopGame()">Stop Game</button>
     <!-- <button class="btn btn-primary" (click)="remove()">REMOVE</button> -->
 </div>
+
+@if (winner) {
+<div class="win-screen text-center p-5">
+    @if(winner.name.toLowerCase() === 'human') {
+    <h2>Congratulations! You won!</h2>
+    } @else {
+    <h2>Game Over! {{ winner.name }} won!</h2>
+    }
+    <button class="btn btn-success mt-3" (click)="newGame()">Restart Game</button>
+</div>
+} @if (!winner) {
 <div class="game ">
 
     @if (players$ | async; as players) { @for(player of players; track $index) {
@@ -105,4 +116,4 @@
     </div>
 
 </div>
-}
+} }
