@@ -1,4 +1,20 @@
-@if (!startGame) {
+@if (gameOverReason === 'win' && winner) {
+<div class="win-screen text-center p-5">
+    @if(winner.name.toLowerCase() === 'human') {
+    <h2>Congratulations! You won!</h2>
+    } @else {
+    <h2>Game Over! {{ winner.name }} won!</h2>
+    }
+</div>
+}
+
+<!-- DRAW SCREEN -->
+@if (gameOverReason === 'draw') {
+<div class="draw-screen text-center p-5">
+    <h2>Match Nul !</h2>
+
+</div>
+} @if (!startGame) {
 <div class="options">
     <button class="btn btn-danger" (click)="newGame()">New Game</button>
     <button class="btn btn-danger" [routerLink]="['/rules']">Rules</button>
@@ -10,24 +26,7 @@
     <!-- <button class="btn btn-primary" (click)="remove()">REMOVE</button> -->
 </div>
 
-@if (gameOverReason === 'win' && winner) {
-<div class="win-screen text-center p-5">
-    @if(winner.name.toLowerCase() === 'human') {
-    <h2>Congratulations! You won!</h2>
-    } @else {
-    <h2>Game Over! {{ winner.name }} won!</h2>
-    }
-    <button class="btn btn-success mt-3" (click)="newGame()">Restart Game</button>
-</div>
-}
-
-<!-- DRAW SCREEN -->
-@if (gameOverReason === 'draw') {
-<div class="draw-screen text-center p-5">
-    <h2>Match Nul !</h2>
-    <button class="btn btn-success mt-3" (click)="newGame()">Restart Game</button>
-</div>
-} @if (startGame && !gameOverReason) {
+@if (startGame && !gameOverReason) {
 <div class="game ">
 
     @if (players$ | async; as players) { @for(player of players; track $index) {
@@ -42,8 +41,11 @@
         }
       {{ player.name}}</span> You can find money, properties, and action cards.</div>
 
-        <div class="player-infos">
 
+
+        @if(player.name.toLowerCase() === 'human') {
+
+        <div class="player-infos">
             @if (player.hand.length - selectedCards$.getValue().length > 7) {
             <div class="alert alert-warning" role="alert">You must play cards until you have at most 7 cards in hand.</div>
             } @if (selectedCards$.getValue().length > 3) {
@@ -51,7 +53,8 @@
             } @if((currentPlayerIndex | async) === 2) {<button [disabled]="isEndTurnDisabled(player)" class="btn btn-success" (click)="endturn()">END TURN</button> }
         </div>
 
-        @if(player.name.toLowerCase() === 'human') { @if(alertMessage) {
+
+        @if(alertMessage) {
         <div class="alert alert-warning alert-dismissible fade show" role="alert">
             {{ alertMessage }}
         </div>}
