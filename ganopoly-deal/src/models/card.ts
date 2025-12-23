@@ -110,3 +110,8 @@ export const ALL_PROPERTY_COLORS = [
   PropertySet.Orange, PropertySet.Red, PropertySet.Yellow, PropertySet.Green,
   PropertySet.Railroad, PropertySet.UtilityElec, PropertySet.UtilityWater
 ];
+
+export interface PropertyGroup {
+  color: PropertySet;
+  cards: Card[];
+}

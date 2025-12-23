@@ -3,7 +3,7 @@ import { DeckService } from '../app/services/deck';
 import { BehaviorSubject, map, Observable } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { GanopolyCardComponent } from '../ganopoly-card/ganopoly-card';
-import { ActionSet, ALL_PROPERTY_COLORS, Card, CardType, PropertySet } from '../models/card';
+import { ActionSet, ALL_PROPERTY_COLORS, Card, CardType, PropertyGroup, PropertySet } from '../models/card';
 import { Player } from '../models/player';
 import { HeaderComponent } from '../header/header';
 import { RouterModule } from '@angular/router';
@@ -226,21 +226,18 @@ export class GameComponent {
   }
 
   private chooseJokerColorForAI(player: Player, card: Card): PropertySet {
-    // Exemple : choisir la couleur qui complète un set déjà existant
-    const colorCounts: Partial<Record<PropertySet, number>> = {};
-    for (const prop of player.properties) {
-      if (prop.setType) {
-        colorCounts[prop.setType] = (colorCounts[prop.setType] || 0) + 1;
-      }
-    }
+    const allowed: PropertySet[] = [card.setType, card.setType2].filter(Boolean) as PropertySet[];
 
-    // Priorité à la couleur avec le plus de cartes
-    const sorted = Object.entries(colorCounts).sort((a, b) => b[1] - a[1]);
-    if (sorted.length) return sorted[0][0] as PropertySet;
+    // Compter combien de cartes le joueur a dans ces couleurs
+    const scores = allowed.map(color => ({
+      color,
+      count: player.properties.filter(p => p.setType === color || p.jokerColor === color).length
+    }));
 
-    // Sinon couleur aléatoire
-    const colors = ALL_PROPERTY_COLORS || [];
-    return colors[Math.floor(Math.random() * colors.length)];
+    // Choisir la couleur où il a le plus de cartes
+    scores.sort((a, b) => b.count - a.count);
+
+    return scores[0].color;
   }
 
 
@@ -510,10 +507,20 @@ export class GameComponent {
 
       case ActionSet.DealSwap:
         // Exemple : échanger une propriété entre joueur et cible
-        if (currentPlayer.properties.length > 0 && target.properties.length > 0) {
-          const temp = currentPlayer.properties.pop()!;
-          currentPlayer.properties.push(target.properties.pop()!);
-          target.properties.push(temp);
+        const eligibleMine = this.getEligiblePropertiesForDuel(currentPlayer);
+        const eligibleTarget = this.getEligiblePropertiesForDuel(target);
+
+        if (eligibleMine.length && eligibleTarget.length) {
+          const myProp = eligibleMine[Math.floor(Math.random() * eligibleMine.length)];
+          const hisProp = eligibleTarget[Math.floor(Math.random() * eligibleTarget.length)];
+
+          currentPlayer.properties = currentPlayer.properties.filter(p => p !== myProp);
+          target.properties = target.properties.filter(p => p !== hisProp);
+
+          currentPlayer.properties.push(hisProp);
+          target.properties.push(myProp);
+        } else {
+          this.showAlert('No eligible properties to swap');
         }
         break;
 
@@ -588,7 +595,9 @@ export class GameComponent {
         }
 
         // On filtre les propriétés du joueur ciblé correspondant à la couleur demandée
-        const targetProps = target.properties.filter(p => p.setType === card.rentColor);
+        const targetProps = target.properties.filter(
+          p => p.setType === card.rentColor || p.jokerColor === card.rentColor
+        );
 
         if (targetProps.length === 0) {
           this.showAlert(`Target player ${target.name} has no property of color ${card.rentColor}. Rent lost.`);
@@ -736,7 +745,7 @@ export class GameComponent {
   getDefaultRentColor(player: Player, card: Card): PropertySet | null {
     if (card.setAction !== ActionSet.Rent) return null;
 
-     const rentColors: PropertySet[] = [card.setType, card.setType2].filter(Boolean) as PropertySet[];
+    const rentColors: PropertySet[] = [card.setType, card.setType2].filter(Boolean) as PropertySet[];
     const availableColors = rentColors.filter(color =>
       player.properties.some(p => p.setType === color || p.setType2 === color)
     );
@@ -916,6 +925,31 @@ export class GameComponent {
       delete updated[player.id];
       this.iaMessages$.next(updated);
     }, duration);
+  }
+
+  groupProperties(player: Player): PropertyGroup[] {
+    const groups: Record<PropertySet, Card[]> = {} as any;
+
+    for (const card of player.properties) {
+      const color = card.type === CardType.PropertyJoker
+        ? (card.jokerColor ?? card.setType)  // joker doit avoir une couleur valide
+        : card.setType;
+
+      if (!color) continue;
+
+      if (!groups[color]) groups[color] = [];
+      groups[color].push(card);
+    }
+
+    return Object.entries(groups).map(([color, cards]) => ({
+      color: color as PropertySet,
+      cards
+    }));
+  }
+
+  isGroupComplete(group: PropertyGroup): boolean {
+    const needed = group.cards[0]?.setSize;
+    return needed ? group.cards.length >= needed : false;
   }
 
 }

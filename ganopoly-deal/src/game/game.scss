@@ -54,6 +54,7 @@
         }
     }
     .player-cards {
+        position: relative;
         display: flex;
         flex-wrap: wrap;
         gap: 1rem;
@@ -88,4 +89,60 @@
     background-color: #000;
     gap: 1rem;
     padding: 1rem;
+}
+
+.property-group {
+    display: inline-block;
+    margin: 6px;
+}
+
+.group-title {
+    text-align: center;
+    font-weight: bold;
+    font-size: 12px;
+    margin-bottom: 4px;
+}
+
+.group-stack {
+    position: relative;
+    width: 80px;
+    height: 120px;
+}
+
+.group-stack ganopoly-card {
+    position: absolute;
+    left: 0;
+    transition: transform .2s;
+}
+
+.group-stack ganopoly-card:nth-child(1) {
+    top: 0px;
+}
+
+.group-stack ganopoly-card:nth-child(2) {
+    top: 14px;
+}
+
+.group-stack ganopoly-card:nth-child(3) {
+    top: 28px;
+}
+
+.group-stack ganopoly-card:nth-child(4) {
+    top: 42px;
+}
+
+.group-stack ganopoly-card:hover {
+    transform: translateY(-6px);
+    z-index: 10;
+}
+
+.complete {
+    color: #00c853;
+    text-shadow: 0 0 6px rgba(0, 255, 0, .4);
+}
+
+.player-properties {
+    position: relative;
+    overflow: hidden;
+    padding-bottom: 15rem;
 }
