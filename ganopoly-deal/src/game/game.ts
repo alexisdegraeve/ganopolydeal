@@ -275,24 +275,24 @@ export class GameComponent {
   //   player.actions.push(card);
   // }
 
-private shouldPlayAction(card: Card, player: Player, players: Player[]): boolean {
-  if (this.getCompletedSets(player) >= 2) return true;
+  private shouldPlayAction(card: Card, player: Player, players: Player[]): boolean {
+    if (this.getCompletedSets(player) >= 2) return true;
 
-  if (card.setAction === ActionSet.Rent)
-    return players.some(p => p.id !== player.id && p.money.length > 0);
+    if (card.setAction === ActionSet.Rent)
+      return players.some(p => p.id !== player.id && p.money.length > 0);
 
-  if (card.setAction && [ActionSet.DealDuel, ActionSet.DealSwap, ActionSet.DealBanco]
+    if (card.setAction && [ActionSet.DealDuel, ActionSet.DealSwap, ActionSet.DealBanco]
       .includes(card.setAction))
-    return players.some(p => this.getCompletedSets(p) >= 1);
+      return players.some(p => this.getCompletedSets(p) >= 1);
 
-  if (card.setAction === ActionSet.Birthday)
-    return players.some(p => p.id !== player.id && p.money.length > 0);
+    if (card.setAction === ActionSet.Birthday)
+      return players.some(p => p.id !== player.id && p.money.length > 0);
 
-  if (card.setAction && [ActionSet.House, ActionSet.Hotel].includes(card.setAction))
-    return this.canPlayHouseOrHotel(player, card);
+    if (card.setAction && [ActionSet.House, ActionSet.Hotel].includes(card.setAction))
+      return this.canPlayHouseOrHotel(player, card);
 
-  return false;
-}
+    return false;
+  }
 
   private playActions(player: Player) {
     const players = [...this.players$.getValue()];
@@ -509,18 +509,18 @@ private shouldPlayAction(card: Card, player: Player, players: Player[]): boolean
   // }
 
   getStealableFullSets(player: Player) {
-  const sets: Record<PropertySet, Card[]> = {} as any;
-  for (const p of player.properties) {
-    if (!p.setType) continue;
-    const c = p.setType as PropertySet;
-    if (!sets[c]) sets[c] = [];
-    sets[c].push(p);
-  }
+    const sets: Record<PropertySet, Card[]> = {} as any;
+    for (const p of player.properties) {
+      if (!p.setType) continue;
+      const c = p.setType as PropertySet;
+      if (!sets[c]) sets[c] = [];
+      sets[c].push(p);
+    }
 
-  return Object.entries(sets)
-    .filter(([color, cards]) => this.isSetComplete(color as PropertySet, cards))
-    .map(([color, cards]) => ({ color, cards }));
-}
+    return Object.entries(sets)
+      .filter(([color, cards]) => this.isSetComplete(color as PropertySet, cards))
+      .map(([color, cards]) => ({ color, cards }));
+  }
 
 
 
@@ -548,7 +548,7 @@ private shouldPlayAction(card: Card, player: Player, players: Player[]): boolean
 
         target.properties = target.properties.filter(p => !chosen.cards.includes(p));
         currentPlayer.properties.push(...chosen.cards);
-          break;
+        break;
 
       case ActionSet.DealSwap:
         // Exemple : échanger une propriété entre joueur et cible
@@ -635,27 +635,35 @@ private shouldPlayAction(card: Card, player: Player, players: Player[]): boolean
           }
         }
 
-        // On filtre les propriétés du joueur ciblé correspondant à la couleur demandée
-        const targetProps = target.properties.filter(
+        // 💥 on compte TES cartes, pas les siennes
+        const myProps = currentPlayer.properties.filter(
           p => p.setType === card.rentColor || p.jokerColor === card.rentColor
         );
 
-        if (targetProps.length === 0) {
-          this.showAlert(`Target player ${target.name} has no property of color ${card.rentColor}. Rent lost.`);
-          // La carte va quand même dans la pile d'actions
-        } else {
-          // Exemple simple : on prend de l'argent équivalent à 1 carte Money par propriété de cette couleur
-          const amountDue = targetProps.length;
-          for (let i = 0; i < amountDue; i++) {
-            if (target.money.length > 0) {
-              const payment = target.money.shift()!;
-              currentPlayer.money.push(payment);
-            } else {
-              this.showAlert(`${target.name} n'a plus d'argent à donner !`);
-              // console.log(`${target.name} n'a plus d'argent à donner`);
-            }
+        if (myProps.length === 0) {
+          this.showAlert(`${currentPlayer.name} has no property of color ${card.rentColor}. Rent lost.`);
+          break;
+        }
+
+        let amountDue = myProps.length;
+
+        // Double rent
+        if (currentPlayer.doubleRent) {
+          amountDue *= 2;
+          currentPlayer.doubleRent = false;
+        }
+
+        // Paiement
+        for (let i = 0; i < amountDue; i++) {
+          if (target.money.length > 0) {
+            const payment = target.money.shift()!;
+            currentPlayer.money.push(payment);
+          } else {
+            this.showAlert(`${target.name} cannot fully pay rent!`);
+            break;
           }
         }
+
 
         // Stocker la carte dans la pile d'actions
         const actionDeck = this.actionDeck$.getValue();
