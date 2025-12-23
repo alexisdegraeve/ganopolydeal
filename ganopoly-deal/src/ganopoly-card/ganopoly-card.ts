@@ -183,7 +183,8 @@ export class GanopolyCardComponent implements OnInit {
 
     // Rent : vérifier si le joueur a au moins une propriété correspondante
     if (this.card.setAction === ActionSet.Rent) {
-      const rentColors: PropertySet[] = this.card.sets || [];
+      const rentColors: PropertySet[] = [this.card.setType, this.card.setType2].filter(Boolean) as PropertySet[];
+      if (rentColors.length === 0) return false;
       return rentColors.some(color =>
         human.properties.some(p => p.setType === color || p.setType2 === color)
       );
@@ -191,7 +192,7 @@ export class GanopolyCardComponent implements OnInit {
 
     // DealSwap
     if (this.card.setAction === ActionSet.DealSwap) {
-      return human.properties.length > 0;
+      return this.humanHasProperties();
     }
 
     // DealDuel : vérifier si au moins un joueur cible a des propriétés éligibles

@@ -736,7 +736,7 @@ export class GameComponent {
   getDefaultRentColor(player: Player, card: Card): PropertySet | null {
     if (card.setAction !== ActionSet.Rent) return null;
 
-    const rentColors: PropertySet[] = card.sets || [];
+     const rentColors: PropertySet[] = [card.setType, card.setType2].filter(Boolean) as PropertySet[];
     const availableColors = rentColors.filter(color =>
       player.properties.some(p => p.setType === color || p.setType2 === color)
     );

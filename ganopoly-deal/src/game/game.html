@@ -69,11 +69,11 @@
 
 
         </div>
-        } @else { @if(player.name.toLowerCase() !== 'human') { @if (iaMessages$ | async; as messages;) {
+        } @else { @if(player.name.toLowerCase() !== 'human') { @if (iaMessages$ | async; as messages;) { @if(messages[player.id]) {
         <div class="alert alert-info">
             {{ messages[player.id] }}
         </div>
-        } }
+        } } }
 
         <div class="player-cards ">
             <span>Total: x{{ player.hand.length }}</span>
