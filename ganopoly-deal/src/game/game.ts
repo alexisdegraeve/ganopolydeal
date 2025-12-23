@@ -1,6 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { DeckService } from '../app/services/deck';
-import { BehaviorSubject, map, Observable } from 'rxjs';
+import { BehaviorSubject, map, Observable, Subscription } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { GanopolyCardComponent } from '../ganopoly-card/ganopoly-card';
 import { ActionSet, ALL_PROPERTY_COLORS, Card, CardType, MoneyGroup, PropertyGroup, PropertySet } from '../models/card';
@@ -12,9 +12,9 @@ import { RouterModule } from '@angular/router';
   selector: 'app-game',
   imports: [CommonModule, GanopolyCardComponent, RouterModule],
   templateUrl: './game.html',
-  styleUrl: './game.scss',
+  styleUrls: ['./game.scss'],
 })
-export class GameComponent {
+export class GameComponent implements OnDestroy {
 
   // cards$: Observable<Card[]> | undefined;
   players$ = new BehaviorSubject<Player[]>([]);
@@ -30,7 +30,7 @@ export class GameComponent {
   gameOverReason: 'win' | 'draw' | null = null;
   winner: Player | null = null;
   iaMessages$ = new BehaviorSubject<Record<number, string>>({});
-
+  private subscriptions: Subscription[] = [];
 
 
   showAlert(message: string, duration = 3000) {
@@ -136,19 +136,24 @@ export class GameComponent {
   }
 
   constructor(private deckService: DeckService) {
-    this.players$.subscribe(players => {
-      console.log('je suis ici ', players);
-      const human = players.find(p => p.name.toLowerCase() === 'human');
-      const total = human ? human.hand.length : 0;
-      console.log('je suis ici ', total);
-      this.totalCardsHuman$.next(total);
-    })
+    this.subscriptions.push(
+      this.players$.subscribe(players => {
+        console.log('je suis ici ', players);
+        const human = players.find(p => p.name.toLowerCase() === 'human');
+        const total = human ? human.hand.length : 0;
+        console.log('je suis ici ', total);
+        this.totalCardsHuman$.next(total);
+      }),
+      this.remainingDeck$.subscribe(deck => {
+        const last = deck.length ? deck[deck.length - 1] : null;
+        this.lastCard$.next(last
+        )
+      })
+    );
+  }
 
-    this.remainingDeck$.subscribe(deck => {
-      const last = deck.length ? deck[deck.length - 1] : null;
-      this.lastCard$.next(last
-      )
-    });
+  ngOnDestroy() {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
   protected playTurn(player: Player) {
@@ -429,7 +434,7 @@ export class GameComponent {
     if (this.checkWin()) return;
 
     // Joueur suivant
-    this.goToNextPlayer();
+    setTimeout(() => this.goToNextPlayer(), 0);
   }
 
   private playJokerAction(card: Card, currentPlayer: Player, players: Player[]) {
@@ -488,7 +493,7 @@ export class GameComponent {
     }
 
     // sinon, on continue automatiquement
-    this.goToNextPlayer();
+    setTimeout(() => this.goToNextPlayer(), 0);
   }
 
   stopGame() {
@@ -659,7 +664,8 @@ export class GameComponent {
             const payment = target.money.shift()!;
             currentPlayer.money.push(payment);
           } else {
-            this.showAlert(`${target.name} cannot fully pay rent!`);
+            this.forcePay(target, currentPlayer, amountDue);
+            // this.showAlert(`${target.name} cannot fully pay rent!`);
             break;
           }
         }
@@ -715,6 +721,46 @@ export class GameComponent {
       this.showIAMessage(currentPlayer, `${currentPlayer.name} applies ${card.setAction} on ${target.name}`);
     }
   }
+
+  private forcePay(from: Player, to: Player, amount: number) {
+    let remaining = amount;
+
+    // 1️⃣ payer avec l'argent
+    while (remaining > 0 && from.money.length > 0) {
+      const card = from.money.shift()!;
+      to.money.push(card);
+      remaining -= card.value ?? 1;
+    }
+
+    // 2️⃣ payer avec propriétés (en commençant par les non-complets)
+    while (remaining > 0 && from.properties.length > 0) {
+      const stealable = this.getEligiblePropertiesForDuel(from);
+      const prop = stealable.length
+        ? stealable[Math.floor(Math.random() * stealable.length)]
+        : from.properties[0];
+
+      from.properties = from.properties.filter(p => p !== prop);
+      to.properties.push(prop);
+      remaining--;
+    }
+
+    // 3️⃣ mort
+    if (remaining > 0) {
+      this.killPlayer(from, to);
+    }
+  }
+
+
+  private killPlayer(dead: Player, killer: Player) {
+    killer.money.push(...dead.money);
+    killer.properties.push(...dead.properties);
+    dead.money = [];
+    dead.properties = [];
+
+    this.showAlert(`💀 ${dead.name} is BANKRUPT! All assets go to ${killer.name}`);
+  }
+
+
 
 
   private payBirthday(from: Player, to: Player) {
