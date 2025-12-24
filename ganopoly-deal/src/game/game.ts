@@ -406,19 +406,27 @@ export class GameComponent implements OnDestroy {
     // 3️⃣ Reset UI selections
     this.selectedCards$.next([]);
 
+    // Vérifie victoire après tour humain
+    if (this.checkWin()) return;
+
     // Regarde le total de carte
-    if (human.hand.length === 0) {
+    if (human.hand.length === 0 && this.remainingDeck$.getValue().length > 0) {
       // Plus de carte tu en rajouttes 5 pour l'humain
       this.takeCards(5, 'human');
     }
 
-    // 4️⃣ Save updated players
+
+    // 6️⃣ Vérifier match nul (draw)
+    if (this.checkDraw()) {
+      this.gameOverReason = 'draw';
+      this.startGame = false;
+      return;
+    }
+
+    //  Save updated players
     this.players$.next(players);
 
-    // Vérifie victoire après tour humain
-    if (this.checkWin()) return;
-
-    // 5️⃣ Pass turn to next player (AI)
+    // Pass turn to next player (AI)
     setTimeout(() => this.goToNextPlayer(), 0);
   }
 
