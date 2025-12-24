@@ -1,11 +1,10 @@
 import { Component, OnDestroy } from '@angular/core';
 import { DeckService } from '../app/services/deck';
-import { BehaviorSubject, map, Observable, Subscription } from 'rxjs';
+import { BehaviorSubject, map, Subscription } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { GanopolyCardComponent } from '../ganopoly-card/ganopoly-card';
-import { ActionSet, ALL_PROPERTY_COLORS, Card, CardType, MoneyGroup, PropertyGroup, PropertySet } from '../models/card';
+import { ActionSet, Card, CardType, MoneyGroup, PropertyGroup, PropertySet } from '../models/card';
 import { Player } from '../models/player';
-import { HeaderComponent } from '../header/header';
 import { RouterModule } from '@angular/router';
 
 @Component({
@@ -123,7 +122,6 @@ export class GameComponent implements OnDestroy {
 
 
   newGame() {
-    console.log('New Game');
     this.startGame = true;
     this.winner = null;
     this.gameOverReason = null;
@@ -138,10 +136,8 @@ export class GameComponent implements OnDestroy {
   constructor(private deckService: DeckService) {
     this.subscriptions.push(
       this.players$.subscribe(players => {
-        console.log('je suis ici ', players);
         const human = players.find(p => p.name.toLowerCase() === 'human');
         const total = human ? human.hand.length : 0;
-        console.log('je suis ici ', total);
         this.totalCardsHuman$.next(total);
       }),
       this.remainingDeck$.subscribe(deck => {
@@ -210,20 +206,6 @@ export class GameComponent implements OnDestroy {
   }
 
 
-  // private playMoneyIfHandFull(player: Player) {
-  //   const moneyCards = player.hand.filter(c => c.type === CardType.Money);
-  //   // Si main > 5 cartes, poser les billets pour se protéger
-  //   if (player.hand.length > 5) {
-  //     const moneyCards = player.hand.filter(c => c.type === 'money');
-  //     moneyCards.forEach(card => this.moveCardToMoney(player, card));
-  //   }
-
-  //   // 2️⃣ Choix stratégique léger (30% du temps)
-  //   if (moneyCards.length > 0 && Math.random() < 0.3) {
-  //     this.moveCardToMoney(player, moneyCards[0]);
-  //   }
-  // }
-
   private playPropertiesJoker(player: Player) {
     const jokers = player.hand.filter(c => c.type === CardType.PropertyJoker);
     jokers.forEach(card => {
@@ -273,12 +255,6 @@ export class GameComponent implements OnDestroy {
     player.hand = player.hand.filter(c => c !== card);
     player.money.push(card);
   }
-
-
-  // private playAction(player: Player, card: Card) {
-  //   player.hand = player.hand.filter(c => c !== card);
-  //   player.actions.push(card);
-  // }
 
   private shouldPlayAction(card: Card, player: Player, players: Player[]): boolean {
     if (this.getCompletedSets(player) >= 2) return true;
@@ -339,7 +315,6 @@ export class GameComponent implements OnDestroy {
 
 
   onCardSelectionChange(event: { card: Card, selected: boolean }) {
-    console.log('onCardSelectionChange', event)
     const current = this.selectedCards$.getValue();
     let updated: Card[];
     if (event.selected) {
@@ -357,15 +332,12 @@ export class GameComponent implements OnDestroy {
 
 
   endturn() {
-    console.log('Fin du tour de l\'humain');
     const players = [...this.players$.getValue()];
 
     // Find human player
     const human = players.find(p => p.name.toLowerCase() === 'human');
     if (!human) return;
 
-
-    console.log('CHECK ', this.selectedCards$.getValue());
     // 1️⃣ Move selected cards into the proper piles
     for (const card of this.selectedCards$.value) {
 
@@ -380,7 +352,7 @@ export class GameComponent implements OnDestroy {
             this.showAlert('Please choose a color for the Joker before playing it');
             continue; // ne pas poser la carte tant que couleur non choisie
           }
-          console.log('push property joker ', card, human.properties);
+
           human.properties.push(card);
           break;
 
@@ -392,9 +364,8 @@ export class GameComponent implements OnDestroy {
           // You can either:
           // - place into a global discard pile
           // - or store actions played by human
-          console.log('check playACtion : ', card.playAction);
+
           if (card.setAction === ActionSet.Joker && card.playAction) {
-            console.log('applyaction ', card);
             this.playJokerAction(card, human, players);
           } else if (card.playAction) {
             this.applyAction(card, human, players);
@@ -416,7 +387,6 @@ export class GameComponent implements OnDestroy {
 
     // 3️⃣ Reset UI selections
     this.selectedCards$.next([]);
-    // this.selectedCards = [];
 
     // Regarde le total de carte
     if (human.hand.length === 0) {
@@ -427,13 +397,10 @@ export class GameComponent implements OnDestroy {
     // 4️⃣ Save updated players
     this.players$.next(players);
 
-    // 5️⃣ Pass turn to next player (AI)
-    //this.playNextAITurn();
-
     // Vérifie victoire après tour humain
     if (this.checkWin()) return;
 
-    // Joueur suivant
+    // 5️⃣ Pass turn to next player (AI)
     setTimeout(() => this.goToNextPlayer(), 0);
   }
 
@@ -500,19 +467,6 @@ export class GameComponent implements OnDestroy {
     this.startGame = false;
   }
 
-  // startHumanTurn() {
-  //   const players = this.players$.getValue();
-  //   const human = players.find(p => p.name.toLowerCase() === 'human');
-  //   if (!human) return;
-
-  //   const cardsToDraw = Math.max(0, 2 - human.hand.length);
-  //   if (cardsToDraw > 0) {
-  //     this.takeCards(cardsToDraw, 'human');
-  //   }
-
-  //   this.players$.next(players); // update observable pour UI
-  // }
-
   getStealableFullSets(player: Player) {
     const sets: Record<PropertySet, Card[]> = {} as any;
     for (const p of player.properties) {
@@ -530,16 +484,12 @@ export class GameComponent implements OnDestroy {
 
 
   applyAction(card: Card, currentPlayer: Player, players: Player[]) {
-    console.log('ard.playAction ', card.playAction);
-    console.log('ard.actionTargetId ', card.actionTargetId);
     if (!card.playAction || (!card.actionTargetId && card.setAction !== ActionSet.PassGo)) return;
 
     // 1️⃣ Trouver le joueur ciblé
     let target = players.find(p => p.id === card.actionTargetId);
-    console.log('target ', target);
     if (!target) {
       target = currentPlayer;
-      console.log('PassGo cible = currentPlayer', target.name);
     }
 
     switch (card.setAction) {
@@ -709,7 +659,6 @@ export class GameComponent implements OnDestroy {
 
 
       case ActionSet.PassGo:
-        console.log('Pass GO actif pour ', currentPlayer.name);
         this.takeCards(2, currentPlayer.name);
         break;
 
@@ -849,9 +798,6 @@ export class GameComponent implements OnDestroy {
   }
 
   isEndTurnDisabled(human: Player): boolean {
-    // const players = this.players$.getValue();
-    // const human = players.find(p => p.name.toLowerCase() === 'human');
-    // console.log('isEndTurnDisabled ', human);
     let selectedCards = this.selectedCards$.getValue();
     if (!human) return true;
 
