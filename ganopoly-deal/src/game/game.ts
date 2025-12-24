@@ -215,44 +215,47 @@ export class GameComponent implements OnDestroy {
   }
 
   private playProperties(player: Player) {
-    // Pour chaque carte propriété dans la main
-    const propertiesInHand = player.hand.filter(c => c.type === 'property');
-    propertiesInHand.forEach(card => {
-      // Si carte complète un set ou commence un set vide, poser sur table
+    const propertiesInHand = player.hand.filter(c => c.type === CardType.Property);
+
+    for (const card of propertiesInHand) {
+
+      // ⛔ STOP SI ON A DÉJÀ GAGNÉ
+      if (this.getCompletedSets(player) >= 3) return;
+
       if (this.canPlaceProperty(card)) {
         this.moveCardToProperties(player, card);
       }
-    });
+    }
   }
 
 
   private getRealPropertyColors(cards: Card[]): PropertySet[] {
-  const colors = new Set<PropertySet>();
+    const colors = new Set<PropertySet>();
 
-  for (const c of cards) {
-    if (c.type === CardType.Property) {
-      if (c.setType) colors.add(c.setType);
+    for (const c of cards) {
+      if (c.type === CardType.Property) {
+        if (c.setType) colors.add(c.setType);
+      }
+
+      if (c.type === CardType.PropertyJoker && c.jokerColor && c.jokerColor !== PropertySet.Multi) {
+        colors.add(c.jokerColor);
+      }
     }
 
-    if (c.type === CardType.PropertyJoker && c.jokerColor && c.jokerColor !== PropertySet.Multi) {
-      colors.add(c.jokerColor);
-    }
+    return Array.from(colors);
   }
-
-  return Array.from(colors);
-}
 
   private chooseJokerColorForAI(player: Player, card: Card): PropertySet {
     const ownedColors = this.getRealPropertyColors(player.properties);
 
-      // Joker MULTI → toutes tes couleurs
-      if (card.setType === PropertySet.Multi) {
-        return ownedColors[Math.floor(Math.random() * ownedColors.length)];
-      }
+    // Joker MULTI → toutes tes couleurs
+    if (card.setType === PropertySet.Multi) {
+      return ownedColors[Math.floor(Math.random() * ownedColors.length)];
+    }
 
-      // Joker bi-couleur
-      const allowed = [card.setType, card.setType2].filter(c => ownedColors.includes(c as PropertySet)) as PropertySet[];
-      return allowed[0];
+    // Joker bi-couleur
+    const allowed = [card.setType, card.setType2].filter(c => ownedColors.includes(c as PropertySet)) as PropertySet[];
+    return allowed[0];
   }
 
 
@@ -897,15 +900,21 @@ export class GameComponent implements OnDestroy {
     return false;
   }
 
+  private countSetCards(color: PropertySet, cards: Card[]): number {
+    return cards.filter(c =>
+      c.type === CardType.Property ||
+      (c.type === CardType.PropertyJoker && c.jokerColor === color)
+    ).length;
+  }
+
   private isSetComplete(color: PropertySet, cards: Card[]): boolean {
     const requiredByColor: Partial<Record<PropertySet, number>> = {
       [PropertySet.Brown]: 2,
       [PropertySet.DarkBlue]: 2
     };
     const needed = requiredByColor[color] ?? 3;
-    return cards.filter(c => c.type === CardType.Property).length >= needed;
+    return this.countSetCards(color, cards) >= needed;
   }
-
   getEligibleSeriesForHouseOrHotel(player: Player, card: Card): PropertySet[] {
     const eligible: PropertySet[] = [];
     const sets: Record<PropertySet, Card[]> = {} as any;
@@ -966,8 +975,19 @@ export class GameComponent implements OnDestroy {
   }
 
   checkDraw(): boolean {
+    const players = this.players$.getValue();
+
+    // Si la pile est vide
     const deckEmpty = this.remainingDeck$.getValue().length === 0;
-    return deckEmpty && !this.winner;
+
+    // Aucun joueur n'a complété 3 sets
+    const noOneWon = !players.some(p => this.getCompletedSets(p) >= 3);
+
+    // Tous les joueurs n'ont plus de cartes en main
+    const handsEmpty = players.every(p => p.hand.length === 0);
+
+    // Draw seulement si toutes ces conditions sont vraies
+    return deckEmpty && noOneWon && handsEmpty;
   }
 
   showIAMessage(player: Player, message: string, duration = 3000) {
