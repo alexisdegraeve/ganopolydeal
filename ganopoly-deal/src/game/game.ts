@@ -225,19 +225,34 @@ export class GameComponent implements OnDestroy {
     });
   }
 
+
+  private getRealPropertyColors(cards: Card[]): PropertySet[] {
+  const colors = new Set<PropertySet>();
+
+  for (const c of cards) {
+    if (c.type === CardType.Property) {
+      if (c.setType) colors.add(c.setType);
+    }
+
+    if (c.type === CardType.PropertyJoker && c.jokerColor && c.jokerColor !== PropertySet.Multi) {
+      colors.add(c.jokerColor);
+    }
+  }
+
+  return Array.from(colors);
+}
+
   private chooseJokerColorForAI(player: Player, card: Card): PropertySet {
-    const allowed: PropertySet[] = [card.setType, card.setType2].filter(Boolean) as PropertySet[];
+    const ownedColors = this.getRealPropertyColors(player.properties);
 
-    // Compter combien de cartes le joueur a dans ces couleurs
-    const scores = allowed.map(color => ({
-      color,
-      count: player.properties.filter(p => p.setType === color || p.jokerColor === color).length
-    }));
+      // Joker MULTI → toutes tes couleurs
+      if (card.setType === PropertySet.Multi) {
+        return ownedColors[Math.floor(Math.random() * ownedColors.length)];
+      }
 
-    // Choisir la couleur où il a le plus de cartes
-    scores.sort((a, b) => b.count - a.count);
-
-    return scores[0].color;
+      // Joker bi-couleur
+      const allowed = [card.setType, card.setType2].filter(c => ownedColors.includes(c as PropertySet)) as PropertySet[];
+      return allowed[0];
   }
 
 

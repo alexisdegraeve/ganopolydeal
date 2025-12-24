@@ -44,7 +44,12 @@ export class GanopolyCardComponent implements OnInit {
   onJokerColorSelected(color: PropertySet) {
     if (!this.card) return;
 
+    // Protection ultime : on interdit Multi comme couleur réelle
+    if (color === PropertySet.Multi) return;
+
     const allowed = this.getAvailableJokerColors(this.card);
+
+    // On vérifie que la couleur choisie est bien une vraie couleur que le joueur possède
     if (!allowed.includes(color)) return;
 
     this.card.jokerColor = color;
@@ -216,21 +221,14 @@ export class GanopolyCardComponent implements OnInit {
     const human = this.getHuman();
     if (!human) return [];
 
-    const ownedColors = new Set<PropertySet>();
-    for (const prop of human.properties) {
-      if (prop.setType) ownedColors.add(prop.setType);
-      if (prop.setType2) ownedColors.add(prop.setType2);
+    const ownedColors = this.getRealPropertyColors(human.properties);
+
+    if (card.setType === PropertySet.Multi) {
+      return ownedColors; // TOUTES ses vraies couleurs
     }
 
-    // 🔹 Joker NON multi → choix imposé
-    if (card.setType && card.setType !== PropertySet.Multi && card.setType2) {
-      return [card.setType, card.setType2].filter(color =>
-        ownedColors.has(color)
-      );
-    }
+    return [card.setType, card.setType2].filter(c => ownedColors.includes(c as PropertySet)) as PropertySet[];
 
-    // 🔹 Joker multi → toutes les couleurs possédées
-    return Array.from(ownedColors);
   }
 
 
@@ -352,6 +350,23 @@ export class GanopolyCardComponent implements OnInit {
 
     const availableColors = this.getAvailableJokerColors(card);
     return availableColors.length > 0;
+  }
+
+
+  private getRealPropertyColors(cards: Card[]): PropertySet[] {
+    const colors = new Set<PropertySet>();
+
+    for (const c of cards) {
+      if (c.type === CardType.Property) {
+        if (c.setType) colors.add(c.setType);
+      }
+
+      if (c.type === CardType.PropertyJoker && c.jokerColor && c.jokerColor !== PropertySet.Multi) {
+        colors.add(c.jokerColor);
+      }
+    }
+
+    return Array.from(colors);
   }
 
 }
