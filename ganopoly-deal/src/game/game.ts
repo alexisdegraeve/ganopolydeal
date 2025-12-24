@@ -351,38 +351,24 @@ export class GameComponent implements OnDestroy {
 
   endturn() {
     const players = [...this.players$.getValue()];
-
-    // Find human player
     const human = players.find(p => p.name.toLowerCase() === 'human');
     if (!human) return;
 
-    // 1️⃣ Move selected cards into the proper piles
-    for (const card of this.selectedCards$.value) {
-
+    // 1️⃣ Jouer les cartes sélectionnées
+    for (const card of this.selectedCards$.getValue()) {
       switch (card.type) {
-
         case CardType.Property:
-          human.properties.push(card);
-          break;
-
         case CardType.PropertyJoker:
-          if (!card.jokerColor) {
+          if (card.type === CardType.PropertyJoker && !card.jokerColor) {
             this.showAlert('Please choose a color for the Joker before playing it');
-            continue; // ne pas poser la carte tant que couleur non choisie
+            continue;
           }
-
           human.properties.push(card);
           break;
-
         case CardType.Money:
           human.money.push(card);
           break;
-
         case CardType.Action:
-          // You can either:
-          // - place into a global discard pile
-          // - or store actions played by human
-
           if (card.setAction === ActionSet.Joker && card.playAction) {
             this.playJokerAction(card, human, players);
           } else if (card.playAction) {
@@ -394,40 +380,109 @@ export class GameComponent implements OnDestroy {
       }
     }
 
-    // 2️⃣ Remove selected cards from the human hand
+    // 2️⃣ Retirer les cartes jouées de la main
     human.hand = human.hand.filter(
-      c =>
-        !this.selectedCards$.getValue().some(s =>
-          s.id === c.id &&
+      c => !this.selectedCards$.getValue().some(
+        s => s.id === c.id &&
           !(s.type === CardType.PropertyJoker && !s.jokerColor)
-        )
+      )
     );
 
-    // 3️⃣ Reset UI selections
+    // 3️⃣ Réinitialiser la sélection
     this.selectedCards$.next([]);
 
-    // Vérifie victoire après tour humain
+    // 4️⃣ Vérifier victoire immédiate
     if (this.checkWin()) return;
 
-    // Regarde le total de carte
+    // 5️⃣ Tirer automatiquement si main vide et pioche disponible
     if (human.hand.length === 0 && this.remainingDeck$.getValue().length > 0) {
-      // Plus de carte tu en rajouttes 5 pour l'humain
       this.takeCards(5, 'human');
     }
 
+    // 6️⃣ Si main vide ET pioche vide → passer le tour automatiquement
+    if (human.hand.length === 0 && this.remainingDeck$.getValue().length === 0) {
+      this.showAlert('No cards to play, passing turn automatically.');
+    }
 
-    // 6️⃣ Vérifier match nul (draw)
-    if (this.checkDraw()) {
+    // 7️⃣ Vérifier si le jeu est bloqué → draw
+    if (this.isGameBlocked()) {
       this.gameOverReason = 'draw';
+      this.startGame = false;
+      this.showAlert('Draw: no cards left and no player can win.');
+      return;
+    }
+
+    this.players$.next(players);
+
+    // 8️⃣ Passer au tour IA
+    setTimeout(() => this.goToNextPlayer(), 0);
+  }
+
+
+
+  goToNextPlayer() {
+    let index = this.currentPlayerIndex.getValue();
+    const players = this.players$.getValue();
+
+    // Joueur suivant
+    index = (index + 1) % players.length;
+    this.currentPlayerIndex.next(index);
+    const player = players[index];
+
+    // Tour IA
+    if (player.name.toLowerCase() !== 'human') {
+      this.playTurn(player);
+    } else {
+      // Tour humain → tirer 2 cartes si possible
+      this.takeCards(2, 'human');
+      this.selectedCards$.next([]);
+      return;
+    }
+
+    // 🔚 Vérifier victoire après tour IA
+    if (this.checkWin()) {
+      this.gameOverReason = 'win';
       this.startGame = false;
       return;
     }
 
-    //  Save updated players
-    this.players$.next(players);
+    // Vérifier si le jeu est bloqué → draw
+    if (this.isGameBlocked()) {
+      this.gameOverReason = 'draw';
+      this.startGame = false;
+      this.showAlert('Match nul : plus de cartes et aucun joueur ne peut gagner.');
+      return;
+    }
 
-    // Pass turn to next player (AI)
+    // Sinon, continuer automatiquement
     setTimeout(() => this.goToNextPlayer(), 0);
+  }
+
+
+  private isGameBlocked(): boolean {
+    const players = this.players$.getValue();
+    const deckEmpty = this.remainingDeck$.getValue().length === 0;
+    const allHandsEmpty = players.every(p => p.hand.length === 0);
+    const noOneCanCompleteSet = players.every(p => this.getMaxPotentialSets(p) < 3);
+    return deckEmpty && allHandsEmpty && noOneCanCompleteSet;
+  }
+
+  private getMaxPotentialSets(player: Player): number {
+    const sets: Record<PropertySet, Card[]> = {} as any;
+    for (const prop of player.properties) {
+      if (!prop.setType) continue;
+      const color = prop.setType as PropertySet;
+      if (!sets[color]) sets[color] = [];
+      sets[color].push(prop);
+    }
+
+    let count = 0;
+    for (const cards of Object.values(sets)) {
+      const color = cards[0]?.setType;
+      if (!color) continue;
+      if (this.isSetComplete(color, cards)) count++;
+    }
+    return count;
   }
 
   private playJokerAction(card: Card, currentPlayer: Player, players: Player[]) {
@@ -453,41 +508,6 @@ export class GameComponent implements OnDestroy {
     this.actionDeck$.next(actionDeck);
   }
 
-
-  goToNextPlayer() {
-    let index = this.currentPlayerIndex.getValue();
-
-    // joueur suivant
-    index = (index + 1) % this.players$.getValue().length;
-    this.currentPlayerIndex.next(index);
-
-    const players = this.players$.getValue();
-    const player = players[index];
-
-    if (player.name.toLowerCase() !== 'human') {
-      this.playTurn(player);
-    } else {
-      this.takeCards(2, 'human');
-      this.selectedCards$.next([]);
-      return; // on s'arrête ici : attente interaction humaine
-    }
-
-    // 🔚 FIN DE TOUR → on vérifie l’état du jeu UNE FOIS
-    if (this.checkWin()) {
-      this.gameOverReason = 'win';
-      this.startGame = false;
-      return;
-    }
-
-    if (this.checkDraw()) {
-      this.gameOverReason = 'draw';
-      this.startGame = false;
-      return;
-    }
-
-    // sinon, on continue automatiquement
-    setTimeout(() => this.goToNextPlayer(), 0);
-  }
 
   stopGame() {
     this.startGame = false;
