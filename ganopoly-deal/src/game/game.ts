@@ -415,6 +415,10 @@ export class GameComponent implements OnDestroy {
     // 6️⃣ Si main vide ET pioche vide → passer le tour automatiquement
     if (human.hand.length === 0 && this.remainingDeck$.getValue().length === 0) {
       this.showAlert('No cards to play, passing turn automatically.');
+      this.gameOverReason = 'draw';
+      this.startGame = false;
+      //this.showAlert('Draw: no cards left and no player can win.');
+       return;
     }
 
     // 7️⃣ Vérifier si le jeu est bloqué → draw
@@ -428,8 +432,7 @@ export class GameComponent implements OnDestroy {
     this.players$.next(players);
 
     // 8️⃣ Passer au tour IA
-    if (!this.startGame) return;
-    setTimeout(() => this.goToNextPlayer(), 0);
+    if (this.startGame) setTimeout(() => this.goToNextPlayer(), 0);
   }
 
 
@@ -464,21 +467,24 @@ export class GameComponent implements OnDestroy {
     if (this.isGameBlocked()) {
       this.gameOverReason = 'draw';
       this.startGame = false;
-      this.showAlert('Match nul : plus de cartes et aucun joueur ne peut gagner.');
+      this.showAlert('Draw: no cards left and no player can win.');
       return;
     }
 
     // Sinon, continuer automatiquement
-    setTimeout(() => this.goToNextPlayer(), 0);
+    if (this.startGame && player.name.toLowerCase() !== 'human') {
+      setTimeout(() => this.goToNextPlayer(), 0);
+    }
   }
 
 
   private isGameBlocked(): boolean {
-    const players = this.players$.getValue();
-    const deckEmpty = this.remainingDeck$.getValue().length === 0;
-    const allHandsEmpty = players.every(p => p.hand.length === 0);
-    const noOneCanCompleteSet = players.every(p => this.getMaxPotentialSets(p) < 3);
-    return deckEmpty && allHandsEmpty && noOneCanCompleteSet;
+  const players = this.players$.getValue();
+  const deckEmpty = this.remainingDeck$.getValue().length === 0;
+  const allHandsEmpty = players.every(p => p.hand.length === 0);
+  const noOneCanWin = players.every(p => this.getMaxPotentialSets(p) < 3);
+
+  return deckEmpty && allHandsEmpty && noOneCanWin;
   }
 
   private getMaxPotentialSets(player: Player): number {
@@ -858,13 +864,16 @@ export class GameComponent implements OnDestroy {
   }
 
   isEndTurnDisabled(human: Player): boolean {
-    let selectedCards = this.selectedCards$.getValue();
     if (!human) return true;
 
-    // 1️⃣ Limite de cartes sélectionnées
+    // Main vide et pioche vide → on ne peut plus jouer
+    if (human.hand.length === 0 && this.remainingDeck$.getValue().length === 0) return true;
+
+    // Limite de cartes sélectionnées
+    const selectedCards = this.selectedCards$.getValue();
     if (selectedCards.length > 3) return true;
 
-    // 2️⃣ Limite de main après avoir joué
+    // Limite de main après avoir joué
     if ((human.hand.length - selectedCards.length) > 7) return true;
 
     return false;
