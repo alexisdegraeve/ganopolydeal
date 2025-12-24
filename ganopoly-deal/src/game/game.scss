@@ -147,3 +147,39 @@
     overflow: hidden;
     padding-bottom: 15rem;
 }
+
+.ganopoly-deal-win {
+    background-image: url('/img/ganopoly-deal-win.svg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    height: 20rem;
+    width: 24rem;
+    display: flex;
+    margin-left: auto;
+    margin-right: auto
+}
+
+.ganopoly-deal-lose {
+    background-image: url('/img/ganopoly-deal-lose.svg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    height: 20rem;
+    width: 24rem;
+    display: flex;
+    margin-left: auto;
+    margin-right: auto
+}
+
+.ganopoly-deal-draw {
+    background-image: url('/img/ganopoly-deal-draw.svg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    height: 20rem;
+    width: 24rem;
+    display: flex;
+    margin-left: auto;
+    margin-right: auto
+}

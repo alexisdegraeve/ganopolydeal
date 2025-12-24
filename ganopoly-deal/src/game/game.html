@@ -1,8 +1,14 @@
-@if (gameOverReason === 'win' && winner) {
+ @if (gameOverReason === 'win' && winner) {
 <div class="win-screen text-center p-5">
     @if(winner.name.toLowerCase() === 'human') {
+    <div class="ganopoly-deal-win">
+
+    </div>
     <h2>Congratulations! You won!</h2>
     } @else {
+    <div class="ganopoly-deal-lose">
+
+    </div>
     <h2>Game Over! {{ winner.name }} won!</h2>
     }
 </div>
@@ -11,8 +17,9 @@
 <!-- DRAW SCREEN -->
 @if (gameOverReason === 'draw') {
 <div class="draw-screen text-center p-5">
-    <h2>Match Nul !</h2>
+    <div class="ganopoly-deal-draw">
 
+    </div>
 </div>
 } @if (!startGame) {
 <div class="options">
