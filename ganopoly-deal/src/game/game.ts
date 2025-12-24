@@ -157,6 +157,7 @@ export class GameComponent implements OnDestroy {
 
     this.aiStoreMoney(player);
     this.playProperties(player);
+    if (this.checkWin()) return;
 
     // Property Joker
     this.playPropertiesJoker(player);
@@ -166,9 +167,12 @@ export class GameComponent implements OnDestroy {
 
     // 3. Jouer les actions offensives intelligemment
     this.playActions(player);
+    if (this.checkWin()) return;
+
 
     // 4. Fin de tour : tirer 2 cartes si possible
     this.drawCards(player);
+    if (this.checkWin()) return;
 
   }
 
@@ -267,6 +271,14 @@ export class GameComponent implements OnDestroy {
   private moveCardToProperties(player: Player, card: Card) {
     player.hand = player.hand.filter(c => c !== card);
     player.properties.push(card);
+
+    // Vérification de victoire immédiate
+    if (this.getCompletedSets(player) >= 3) {
+        this.winner = player;
+        this.gameOverReason = 'win';
+        this.startGame = false;
+        this.showAlert(`${player.name} wins!`);
+    }
   }
 
   private moveCardToMoney(player: Player, card: Card) {
