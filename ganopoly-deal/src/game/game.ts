@@ -376,6 +376,7 @@ export class GameComponent implements OnDestroy {
             continue;
           }
           human.properties.push(card);
+          if (this.checkWin()) return;
           break;
         case CardType.Money:
           human.money.push(card);
@@ -427,6 +428,7 @@ export class GameComponent implements OnDestroy {
     this.players$.next(players);
 
     // 8️⃣ Passer au tour IA
+    if (!this.startGame) return;
     setTimeout(() => this.goToNextPlayer(), 0);
   }
 
@@ -997,22 +999,25 @@ export class GameComponent implements OnDestroy {
 
 
 
-  private getCompletedSets(player: Player): number {
-    const sets: Record<PropertySet, Card[]> = {} as any;
-    for (const prop of player.properties) {
-      if (!prop.setType) continue;
-      const color = prop.setType as PropertySet;
-      if (!sets[color]) sets[color] = [];
-      sets[color].push(prop);
-    }
+private getCompletedSets(player: Player): number {
+  const sets: Record<PropertySet, Card[]> = {} as any;
+  for (const prop of player.properties) {
+    const color = prop.type === CardType.PropertyJoker
+      ? prop.jokerColor
+      : prop.setType;
 
-    let count = 0;
-    for (const [colorKey, cards] of Object.entries(sets)) {
-      const color = colorKey as PropertySet;
-      if (this.isSetComplete(color, cards)) count++;
-    }
-    return count;
+    if (!color) continue;
+    if (!sets[color]) sets[color] = [];
+    sets[color].push(prop);
   }
+
+  let count = 0;
+  for (const [colorKey, cards] of Object.entries(sets)) {
+    const color = colorKey as PropertySet;
+    if (this.isSetComplete(color, cards)) count++;
+  }
+  return count;
+}
 
   checkDraw(): boolean {
     const players = this.players$.getValue();
